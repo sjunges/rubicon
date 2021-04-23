@@ -1,0 +1,44 @@
+dtmc
+
+const double p1=0.4;
+const double p2=0.5;
+const double p3=0.65;
+const double p4=0.75;
+const double p5=0.85;
+const double p6=0.9;
+const double p7=0.92;
+const double p8=0.96;
+const double p9=0.91;
+const double p10=0.99;
+const double p11=0.98;
+const double p12=0.93;
+
+const int N;
+const int N1 = N;
+const int N2 = N;
+const int N3 = N;
+const int N4 = N;
+const int N5 = N;
+const int N6 = N;
+const int N7 = N;
+const int N8 = N;
+
+module queue1
+    pos1 : [0..N1] init 0;
+    [step] pos1 < N1 -> p1: (pos1'=pos1+1) + 1-p1: (pos1'=pos1);
+    [step] pos1 = N1 -> 1: (pos1'=pos1);
+endmodule
+
+module queue2=queue1[pos1=pos2,p1=p2,N1=N2] endmodule
+module queue3=queue1[pos1=pos3,p1=p3,N1=N3] endmodule
+module queue4=queue1[pos1=pos4,p1=p4,N1=N4] endmodule
+module queue5=queue1[pos1=pos5,p1=p5,N1=N5] endmodule
+module queue6=queue1[pos1=pos6,p1=p6,N1=N6] endmodule
+module queue7=queue1[pos1=pos7,p1=p7,N1=N7] endmodule
+module queue8=queue1[pos1=pos8,p1=p8,N1=N8] endmodule
+
+
+label "target" = pos1=N1 & pos2=N2 & pos3=N3 & (pos4 < N4 | pos5 < N5 | pos6 < N6 | pos7 < N7 | pos8 < N8);
+
+
+

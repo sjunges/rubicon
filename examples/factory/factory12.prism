@@ -1,0 +1,67 @@
+dtmc
+
+const double p1 = 0.1;
+const double q1 = 0.2;
+
+const double p2 = 0.2;
+const double q2 = 0.3;
+
+const double p3 = 0.41;
+const double q3 = 0.45;
+
+const double p4 = 0.94;
+const double q4 = 0.243;
+
+const double p5 = 0.434;
+const double q5 = 0.293;
+
+const double p6 = 0.4341;
+const double q6 = 0.2934;
+
+const double p7 = 0.4345;
+const double q7 = 0.2939;
+
+const double p8 = 0.4344;
+const double q8 = 0.2924;
+
+const double p9 = 0.4499;
+const double q9 = 0.2933;
+
+const double p10 = 0.438;
+const double q10 = 0.233;
+
+const double p11 = 0.4384;
+const double q11 = 0.2334;
+
+const double p12 = 0.43813;
+const double q12 = 0.23394;
+
+const double p13 = 0.43822;
+const double q13 = 0.23313;
+
+const double p14 = 0.4381;
+const double q14 = 0.23381;
+
+const double p15 = 0.4382;
+const double q15 = 0.2333;
+
+
+module factory1
+    state1 : bool init false;
+    [act] !state1 -> p1: (state1'=true) + 1-p1: (state1'=false);
+    [act]  state1 -> q1: (state1'=true) + 1-q1: (state1'=false);
+endmodule
+module factory2 = factory1[state1=state2,p1=p2,q1=q2] endmodule
+module factory3 = factory1[state1=state3,p1=p3,q1=q3] endmodule
+module factory4 = factory1[state1=state4,p1=p4,q1=q4] endmodule
+module factory5 = factory1[state1=state5,p1=p5,q1=q5] endmodule
+module factory6 = factory1[state1=state6,p1=p6,q1=q6] endmodule
+module factory7 = factory1[state1=state7,p1=p7,q1=q7] endmodule
+module factory8 = factory1[state1=state8,p1=p8,q1=q8] endmodule
+module factory9 = factory1[state1=state9,p1=p9,q1=q9] endmodule
+module factory10 = factory1[state1=state10,p1=p10,q1=q10] endmodule
+module factory11 = factory1[state1=state11,p1=p11,q1=q11] endmodule
+module factory12 = factory1[state1=state12,p1=p12,q1=q12] endmodule
+
+label "allStrike" = state1 & state2 & state3 & state4 & state5 & state6 & state7 & state8 & state9 & state10 & state11 & state12;
+
