@@ -58,7 +58,7 @@ to create the asymetric version of Herman protocol
 
 We can configure the script to run Dice (from commandline) directly:
 ```
-python rubicon/regression.py include-dice --cwd "~/dice" --cmd "dune exec dice --" weatherfactory -H 10 -H 15 -N 8 -N 10 
+python rubicon/regression.py include-dice --cwd "/opt/rubicon" --cmd "dice" weatherfactory -H 10 -H 15 -N 8 -N 10 
 ```
 
 
