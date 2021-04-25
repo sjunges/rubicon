@@ -13,5 +13,22 @@ COPY . .
 
 RUN python setup.py install
 
+# install dice
+
+RUN apt-get install -y ocaml opam
+
+RUN opam init --disable-sandboxing --yes
+
+RUN eval $(opam env)
+
+RUN opam switch create 4.09.0
+
+RUN opam install --yes depext
+
+RUN opam depext --yes mlcuddidl
+
+RUN opam pin add --yes dice git+https://github.com/SHoltzen/dice.git#b6d52d5
+
+RUN eval $(opam env)
 
 
