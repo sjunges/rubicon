@@ -79,13 +79,14 @@ def include_dice(ctx, cwd, cmd, extra_arguments, only_parse):
 @click.option("--cwd", default=".")
 @click.option("--cmd", default="dice")
 @click.option("--extra-arguments", default="")
+@click.option("--add", is_flag=True)
 @click.pass_context
-def include_storm(ctx, cwd, cmd, extra_arguments):
+def include_storm(ctx, cwd, cmd, extra_arguments, add):
     if extra_arguments == "":
         arguments = []
     else:
         arguments = extra_arguments.strip().split(" ")
-    storm = storm_wrapper.Storm(cwd, cmd, arguments)
+    storm = storm_wrapper.Storm(cwd, cmd, arguments, symbolic=add)
     ctx.obj.storm_wrapper = storm
 
 

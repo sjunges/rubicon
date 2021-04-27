@@ -6,13 +6,15 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 class Storm:
-    def __init__(self, cwd, path, arguments):
+    def __init__(self, cwd, path, arguments, symbolic):
         self._path = path.split(" ")
         self._cwd = cwd
         if arguments is None:
             self._arguments = ['-tm', '--sylvan:threads', '1']
         else:
             self._arguments = arguments + ['-tm', '--sylvan:threads', '1']
+        if symbolic:
+            self._arguments += ['-e', 'dd']
 
     def run(self, prism_path, prop, constants):
         stats = dict()
