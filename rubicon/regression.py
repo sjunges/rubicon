@@ -42,9 +42,9 @@ def get_output_path(family, filename):
 
 
 class RubiconContext:
-    def __init__(self, stats_path, dice = None, storm = None):
+    def __init__(self, stats_path, csv_path, dice = None, storm = None):
         self.stats_path = stats_path
-        self.csv_path = "stats.csv"
+        self.csv_path = csv_path
         self.dice_wrapper = dice
         self.storm_wrapper = storm
         self._all_stats = []
@@ -58,11 +58,24 @@ class RubiconContext:
     def finalize(self):
         if self.csv_path is not None:
             logger.info(f"Export stats to {self.csv_path}")
-            pass
+            with open(self.csv_path, 'w') as file:
+                file.write("family, instance, dice-time, dice-result, storm-time, storm-result\n")
+                for stats in self._all_stats:
+                    row = [stats["family"], ";".join([f"{k}={v}" for k,v in stats["identifiers"].items()])]
+                    for tool in ["dice","storm"]:
+                        if tool in stats:
+                            row.append("{:.2f}".format(float(stats[tool]["total_time"])))
+                            row.append("{:.5f}".format(float(stats[tool]["result"])))
+                        else:
+                            row.append("")
+                            row.append("")
+                    file.write(",".join(row))
+
+                    file.write("\n")
 
 @click.group(chain=True)
 @click.option("--stats-file", default="stats.json")
-@click.option("--export-csv")
+@click.option("--export-csv", type=str)
 @click.pass_context
 def cli(ctx, stats_file, export_csv):
     ctx.obj = RubiconContext(stats_file, export_csv)
