@@ -2,8 +2,9 @@ import subprocess
 import logging
 import json
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class Dice:
     def __init__(self, cwd, path, arguments):
@@ -26,7 +27,7 @@ class Dice:
         stats["total_time"] = j[1]["Total time"]
         stats["result"] = str(j[0]["Joint Distribution"][2][1])
         #
-        logger.info("Done. ")
+        logger.info(f"Done: Result: {stats['result']}. Took {stats['total_time']}s")
         return stats
 
 
