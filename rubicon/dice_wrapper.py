@@ -9,9 +9,9 @@ class Dice:
         self._path = path.split(" ")
         self._cwd = cwd
         if arguments is None:
-            self._arguments = []
+            self._arguments = [" -json"]
         else:
-            self._arguments = arguments
+            self._arguments = arguments + [" -json"]
 
     def run(self, file):
         logger.info("Run Dice...")
