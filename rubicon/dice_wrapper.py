@@ -1,5 +1,6 @@
 import subprocess
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -9,9 +10,9 @@ class Dice:
         self._path = path.split(" ")
         self._cwd = cwd
         if arguments is None:
-            self._arguments = [" -json"]
+            self._arguments = ["-json", "-time"]
         else:
-            self._arguments = arguments + [" -json"]
+            self._arguments = arguments + ["-json", "-time"]
 
     def run(self, file):
         logger.info("Run Dice...")
@@ -19,8 +20,9 @@ class Dice:
         stdout, stderr = process.communicate()
         stdout = stdout.decode("utf-8")
         stderr = stderr.decode("utf-8")
-        print(stdout)
-        print(stderr)
+        j = json.loads(stdout)
+        print(file + "," + j[1]["Total time"] + ",\"" + str(j[0]["Joint Distribution"]) + "\"\n")
+        # print(stderr)
         logger.info("Done. ")
 
 
