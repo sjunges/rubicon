@@ -1,5 +1,6 @@
 import os.path
 import json
+import logging
 import rubicon
 import dice_wrapper
 import storm_wrapper
@@ -7,6 +8,27 @@ import click
 import numpy as np
 from pathlib import Path
 
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+# create formatter
+chformatter = logging.Formatter('%(message)s')
+
+# add formatter to ch
+ch.setFormatter(chformatter)
+fhformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+fh = logging.FileHandler("rubicon-regression.log")
+fh.setLevel(logging.DEBUG)
+fh.setFormatter(fhformatter)
+
+# add ch to logger
+root.addHandler(ch)
+root.addHandler(fh)
 
 def get_examples_path(family, filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "examples", family, filename)
@@ -57,12 +79,14 @@ def include_dice(ctx, cwd, cmd, extra_arguments, only_parse):
 @click.option("--cwd", default=".")
 @click.option("--cmd", default="dice")
 @click.option("--extra-arguments", default="")
-def include_storm(ctx, cwd, cmd, extra_arguments):
+@click.option("--add", is_flag=True)
+@click.pass_context
+def include_storm(ctx, cwd, cmd, extra_arguments, add):
     if extra_arguments == "":
         arguments = []
     else:
         arguments = extra_arguments.strip().split(" ")
-    storm = storm_wrapper.Storm(cwd, cmd, arguments)
+    storm = storm_wrapper.Storm(cwd, cmd, arguments, symbolic=add)
     ctx.obj.storm_wrapper = storm
 
 
