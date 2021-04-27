@@ -1,6 +1,8 @@
 import os.path
+import json
 import rubicon
 import dice_wrapper
+import storm_wrapper
 import click
 import numpy as np
 from pathlib import Path
@@ -16,14 +18,23 @@ def get_output_path(family, filename):
 
 
 class RubiconContext:
-    def __init__(self, dice):
+    def __init__(self, stats_path, dice = None, storm = None):
+        self.stats_path = stats_path
         self.dice_wrapper = dice
+        self.storm_wrapper = storm
+        self._all_stats = []
+
+    def store_stats(self, stats_dict):
+        self._all_stats.append(stats_dict)
+        with open(self.stats_path, 'w') as file:
+            json.dump(self._all_stats, file)
+
 
 @click.group(chain=True)
+@click.option("--stats-file", default="stats.json")
 @click.pass_context
-def cli(ctx):
-    dice = None
-    ctx.obj = RubiconContext(dice)
+def cli(ctx, stats_file):
+    ctx.obj = RubiconContext(stats_file)
     return ctx
 
 @cli.command()
@@ -41,6 +52,18 @@ def include_dice(ctx, cwd, cmd, extra_arguments, only_parse):
         arguments += ["-skip-table"]
     dice = dice_wrapper.Dice(cwd, cmd, arguments)
     ctx.obj.dice_wrapper = dice
+
+@cli.command()
+@click.option("--cwd", default=".")
+@click.option("--cmd", default="dice")
+@click.option("--extra-arguments", default="")
+def include_storm(ctx, cwd, cmd, extra_arguments):
+    if extra_arguments == "":
+        arguments = []
+    else:
+        arguments = extra_arguments.strip().split(" ")
+    storm = storm_wrapper.Storm(cwd, cmd, arguments)
+    ctx.obj.storm_wrapper = storm
 
 
 #
@@ -70,10 +93,20 @@ def _sample():
         res = np.random.random_sample()
     return res
 
-def _run(rubicon_context, prism_path, prop, consts, dice_path, **kwargs):
+def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_path, **kwargs):
     rubicon.translate(prism_path, prop, consts, dice_path, **kwargs)
+    stats = dict()
+    stats["family"] = family_name
+    stats["identifiers"] = instance
+    stats["prism_path"] = prism_path
+    stats["prop"] = prop
+    stats["constants"] = consts
     if rubicon_context.dice_wrapper is not None:
-        rubicon_context.dice_wrapper.run(dice_path)
+        stats["dice"] = rubicon_context.dice_wrapper.run(dice_path)
+    if rubicon_context.storm_wrapper is not None:
+        stats["storm"] = rubicon_context.storm_wrapper.run(prism_path, prop, consts)
+    rubicon_context.store_stats(stats)
+
 
 @cli.command()
 @click.option("--nr_factories", "-N", type=click.Choice(['10', '12', '15']), multiple=True, default=[10])
@@ -95,7 +128,7 @@ def factory_parametric(nr_factories, horizon):
 def factory(ctx, nr_factories, horizon):
     for N in nr_factories:
         for H in horizon:
-            _run(ctx.obj, get_examples_path("factory", f"factory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
+            _run(ctx.obj, "factory", {"N": N, "horizon": H}, get_examples_path("factory", f"factory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
                  get_output_path("factory", f"factory{N}-H={H}.dice"))
 
 
@@ -106,7 +139,7 @@ def factory(ctx, nr_factories, horizon):
 def weatherfactory(ctx, nr_factories, horizon):
     for N in nr_factories:
         for H in horizon:
-            _run(ctx.obj, get_examples_path("weatherfactory", f"weatherfactory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
+            _run(ctx.obj, "weatherfactory", {"N": N, "horizon": H}, get_examples_path("weatherfactory", f"weatherfactory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
                  get_output_path("weatherfactory", f"weatherfactory{N}-H={H}.dice"))
 
 
@@ -119,7 +152,7 @@ def parqueues(ctx, nr_queues, nr_elements, horizon):
     for K in nr_queues:
          for N in nr_elements:
              for H in horizon:
-                 _run(ctx.obj, get_examples_path("parqueues", f"queue-{K}.nm"), f"P=? [ F<={H} \"target\" ]", f"N={N}", get_output_path("parqueues", f"queues-{K}-{N}-H={H}.dice"), force_bounded=True)
+                 _run(ctx.obj,  "parqueues", {"K": K, "N": N, "horizon": H}, get_examples_path("parqueues", f"queue-{K}.nm"), f"P=? [ F<={H} \"target\" ]", f"N={N}", get_output_path("parqueues", f"queues-{K}-{N}-H={H}.dice"), force_bounded=True)
 
 
 @cli.command()
@@ -131,10 +164,10 @@ def herman(ctx, nr_stations, asym, horizon):
     for N in nr_stations:
         for H in horizon:
             if asym:
-                _run(ctx.obj, get_examples_path("herman", f"herman-{N}-random-input.prism"), f"P=? [ F<={H} \"stable\" ]", f"",
+                _run(ctx.obj, "herman", {"asym": True, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}-random-input.prism"), f"P=? [ F<={H} \"stable\" ]", f"",
                      get_output_path("herman", f"herman-ri-{N}-H={H}.dice"), overlapping_guards=True)
             else:
-                _run(ctx.obj, get_examples_path("herman", f"herman-{N}.prism"), f"P=? [ F<={H} \"stable\" ]", f"", get_output_path("herman", f"herman-{N}-H={H}.dice"), overlapping_guards=True)
+                _run(ctx.obj, "herman", {"asym": False, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}.prism"), f"P=? [ F<={H} \"stable\" ]", f"", get_output_path("herman", f"herman-{N}-H={H}.dice"), overlapping_guards=True)
 
 
 @cli.command()
@@ -146,7 +179,7 @@ def brp(ctx, chunks, retries, horizon):
     for N in chunks:
         for MAX in retries:
              for H in horizon:
-                 _run(ctx.obj, get_examples_path("brp", "brp.v1.prism"), f"P=? [ F<={H} s=5 ]", f"N={N},MAX={MAX}", get_output_path("brp", f"brp-{N}-{MAX}-H={H}.dice"), make_flat=False)
+                 _run(ctx.obj,  "brp", {"retries": MAX, "chunks": N, "horizon": H}, get_examples_path("brp", "brp.v1.prism"), f"P=? [ F<={H} s=5 ]", f"N={N},MAX={MAX}", get_output_path("brp", f"brp-{N}-{MAX}-H={H}.dice"), make_flat=False)
 
 
 @cli.command()
@@ -158,7 +191,7 @@ def nand(ctx, n_values, k_values, horizon):
     for N in n_values:
         for K in k_values:
             for H in horizon:
-                _run(ctx.obj, get_examples_path("nand", "nand.v1.prism"), f"P=? [ F<={H} s=4 & 10*z<N ]", f"N={N},K={K}", get_output_path("nand", f"nand-{N}-{K}-H={H}.dice"))
+                _run(ctx.obj, "nand", {"N": N, "K": K, "horizon": H}, get_examples_path("nand", "nand.v1.prism"), f"P=? [ F<={H} s=4 & 10*z<N ]", f"N={N},K={K}", get_output_path("nand", f"nand-{N}-{K}-H={H}.dice"))
 
 
 @cli.command()
@@ -170,7 +203,7 @@ def egl(ctx, n_values, l_values, horizon):
     for N in n_values:
         for L in l_values:
             for H in horizon:
-                _run(ctx.obj, get_examples_path("egl","egl.v1.prism"), f"P=? [ F<={H} !\"knowA\" & \"knowB\" ]", f"N={N},L={L}", get_output_path("egl", f"egl-{N}-{L}-H={H}.dice"), force_max_int_val=20)
+                _run(ctx.obj, "egl", {"N": N, "L": L, "horizon": H}, get_examples_path("egl","egl.v1.prism"), f"P=? [ F<={H} !\"knowA\" & \"knowB\" ]", f"N={N},L={L}", get_output_path("egl", f"egl-{N}-{L}-H={H}.dice"), force_max_int_val=20)
 
 
 @cli.command()
@@ -182,7 +215,7 @@ def crowds(ctx, runs, crowdsize, horizon):
     for R in runs:
         for S in crowdsize:
             for H in horizon:
-                _run(ctx.obj, get_examples_path("crowds", "crowds.v1.prism"), f"P=? [ F<={H} observe0>1]", f"TotalRuns={R},CrowdSize={S},PF=0.8,badC=0.2", get_output_path("crowds", f"crowds-{R}-{S}-H={H}.dice"), overlapping_guards=True)
+                _run(ctx.obj, "crowds", {"Runs": R, "Size": S, "horizon": H}, get_examples_path("crowds", "crowds.v1.prism"), f"P=? [ F<={H} observe0>1]", f"TotalRuns={R},CrowdSize={S},PF=0.8,badC=0.2", get_output_path("crowds", f"crowds-{R}-{S}-H={H}.dice"), overlapping_guards=True)
 
 
 @cli.command()
@@ -194,7 +227,7 @@ def leader(ctx, n_values, k_values, horizon):
     for N in n_values:
         for K in k_values:
             for H in horizon:
-                _run(ctx.obj, get_examples_path("leader_sync", f"leader_synch_{N}_{K}.prism"), f"P=? [ F<={H} \"elected\" ]", "", get_output_path("leader_sync",  f"leader_sync_{N}_{K}-H={H}.dice"), make_flat=False, force_bounded=True)
+                _run(ctx.obj, "leader", {"N": N, "K": K, "horizon": H}, get_examples_path("leader_sync", f"leader_synch_{N}_{K}.prism"), f"P=? [ F<={H} \"elected\" ]", "", get_output_path("leader_sync",  f"leader_sync_{N}_{K}-H={H}.dice"), make_flat=False, force_bounded=True)
 
 
 if __name__ == "__main__":

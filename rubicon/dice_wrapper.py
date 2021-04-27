@@ -16,14 +16,17 @@ class Dice:
 
     def run(self, file):
         logger.info("Run Dice...")
+        stats = dict()
+        stats["file"] = file
         process = subprocess.Popen(self._path + self._arguments + [file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self._cwd)
         stdout, stderr = process.communicate()
         stdout = stdout.decode("utf-8")
         stderr = stderr.decode("utf-8")
         j = json.loads(stdout)
-        print(file + "," + j[1]["Total time"] + ",\"" + str(j[0]["Joint Distribution"]) + "\"\n")
-        # print(stderr)
+        stats["total_time"] = j[1]["Total time"]
+        stats["result"] = str(j[0]["Joint Distribution"][2][1])
+        #
         logger.info("Done. ")
-
+        return stats
 
 
