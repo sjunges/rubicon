@@ -19,6 +19,7 @@ def translate_cli(model, property, constants, output):
     translate(model, property, constants, output)
 
 def translate(model, property, constants, output, parameter_instantiations = dict(), overlapping_guards=True, make_flat = False, force_bounded = True, track_goal = False, force_max_int_val = 0):
+    logger.info(f"Translating {model} to {output}")
     program, props = load_prism_program(model, property, constants)
     assert len(props) == 1, "One prop in, one prop out"
     if make_flat and not overlapping_guards:
@@ -411,7 +412,7 @@ def translate_prism(flat_program, props, step_bound, maxintval, prob0expressions
         else_str = " "
         if has_overlapping_guards:
             actions = dict()
-            logger.info(f"Program has {len(flat_program.modules)}  modules.")
+            logger.debug(f"Program has {len(flat_program.modules)}  modules.")
             if len(flat_program.modules) > 1:
                 # We run this analysis as we currently do not want to support awkward weight-counting
                 oga = stormpy.storage.OverlappingGuardAnalyser(flat_program, stormpy.utility.Z3SmtSolverFactory())
