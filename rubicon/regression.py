@@ -76,7 +76,7 @@ def _run(rubicon_context, prism_path, prop, consts, dice_path, **kwargs):
         rubicon_context.dice_wrapper.run(dice_path)
 
 @cli.command()
-@click.option("--nr_factories", "-N", type=click.Choice([10, 12, 15]), multiple=True, default=[10])
+@click.option("--nr_factories", "-N", type=click.Choice(['10', '12', '15']), multiple=True, default=[10])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def factory_parametric(nr_factories, horizon):
