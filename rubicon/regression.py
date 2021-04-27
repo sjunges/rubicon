@@ -13,16 +13,22 @@ root.setLevel(logging.DEBUG)
 
 # create console handler and set level to debug
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+chformatter = logging.Formatter('%(message)s')
 
 # add formatter to ch
-ch.setFormatter(formatter)
+ch.setFormatter(chformatter)
+fhformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+fh = logging.FileHandler("rubicon-regression.log")
+fh.setLevel(logging.DEBUG)
+fh.setFormatter(fhformatter)
 
 # add ch to logger
 root.addHandler(ch)
+root.addHandler(fh)
 
 def get_examples_path(family, filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "examples", family, filename)
