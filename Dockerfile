@@ -20,7 +20,7 @@ RUN opam install --yes depext
 
 RUN opam depext --yes mlcuddidl
 
-RUN opam pin add --yes dice git+https://github.com/SHoltzen/dice.git#aa1317d
+RUN opam pin add --yes dice git+https://github.com/SHoltzen/dice.git#8271e01
 
 RUN eval $(opam env)
 
