@@ -42,8 +42,8 @@ class Storm:
             logger.info(f"Done: Result: {stats['result']}. Took {stats['total_time']}s")
             return stats
         except subprocess.TimeoutExpired:
-            stats["total_time"] = "TO"
-            stats["result"] = "N/A"
+            stats["total_time"] = -1
+            stats["result"] = -1
             logger.info(f"Time out: Result: {stats['result']}. Took {stats['total_time']}s")
             return stats
 
