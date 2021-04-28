@@ -21,38 +21,53 @@ The following command will run the docker container (for Windows platforms, plea
 ```
 docker run --mount type=bind,source="$(pwd)",target=/data -w /opt/rubicon --rm -it --name rubicon sjunges/rubicon:cav21
 ```
-Files that one copies into `/data` are available on the host system in the current working directory. 
+To export files out of the Docker image,
+files that are in the `/data` directory inside the image are available on the host system in the current working directory.
 
 ## Installation Procedure
 
-Users of an artefact/Docker container can skip this step.
+Users of an artifact/Docker container can skip this step.
 
 - Install Storm and Stormpy from source [as usual](https://moves-rwth.github.io/stormpy/installation.html).
     - but using [this repository for Storm](https://github.com/sjunges/storm/tree/prismlang-sim)
     - and [this repository for Stormpy](https://github.com/sjunges/stormpy/tree/prismlang-sim)
     (Note: These branches are in the process of being merged back into Storm(py) version 1.7.0)
-- Install Dice from source [from this branch](https://github.com/SHoltzen/dice/blob/master/README.md)
+- Install Dice from source [from this branch](https://github.com/SHoltzen/dice/tree/symbolic)
 
 ## Experiments
-To reproduce the experiments from [1], we provide some convenience scripts.
+To reproduce the experiments from [1], we provide some convenience scripts. First, inside the VM, 
+set up the environment by executing:
 
-### Transpilation process
-In particular, please run 
 ```
-python rubicon/regression.py factory -H 10 -H 15 -N 8 -N 10 
+eval $(opam env)
 ```
-to create four Dice programs for the factory benchmark into `dice-examples/factory`
-(the programs will correspond to the combinations of having a 8 or 10 factories and a horizon of 10 or 15 steps).
 
-Similar options are available for other benchmarks, e.g.:
+### Recreating the Figures and Tables in the Paper
+The following commands each generate a CSV file that contains the data that is used to generate each figure. 
+
+To generate a CSV file for **Figure 1c**, please run:
+
 ```
-python rubicon/regression.py weatherfactory -H 10 -H 15 -N 8 -N 10 
+python rubicon/regression.py --export-csv "fig1c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" factory -H 10 -N 5 -N 9 -N 12 -N 13 -N 15 -N 17 -N 19
 ```
-to create the weather factories with the same parameters, or 
+This will create a series of benchmark evaluations with horizon 10 (`-H 10`) and 8, 10, 13, 15, 17, and 19 parallel factories. This generates a file `fig1c.csv` which has the following contents (note that precise numbers may vary due to differences in the running environment, but the important thing is that the relative trend of rubicon scaling to more states holds):
 ```
-python rubicon/regression.py herman --asym -H 10 -H 15 -N 13 
+family, instance, dice-time, dice-result, storm-time, storm-result
+factory,N=5;horizon=10,0.01,0.04459,0.02,0.04459
+factory,N=9;horizon=10,0.04,0.00054,0.19,0.00054
+factory,N=12;horizon=10,0.54,0.00003,12.84,0.00003
+...
 ```
-to create the asymetric version of Herman protocol
+
+**Figure 9a**: 
+```
+python rubicon/regression.py --export-csv "fig9a.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" weatherfactory -H 10 -N 9 -N 12 -N 15 -N 17
+```
+
+**Figure 9b**:
+```
+
+```
 
 ### Invoking Dice directly
 
@@ -62,7 +77,7 @@ python rubicon/regression.py include-dice --cwd "/opt/rubicon" --cmd "dice" weat
 ```
 
 
-## How to run Rubicon on own files?
+## How can I run Rubicon on my own files?
 
 
 
@@ -71,9 +86,24 @@ python rubicon/regression.py include-dice --cwd "/opt/rubicon" --cmd "dice" weat
 The docker container is built using the included Dockerfile. 
 The container is based on an container for the probabilistic model checker as provided by the storm developers, 
 see [this documentation](https://www.stormchecker.org/documentation/obtain-storm/docker.html)
+The container can be built by executing a command in the `rubicon` directory like:
+
+```
+docker build --tag rubicon:1.0 .
+```
 
 ## Sources
 
 ## References
 - [2] https://www.stormchecker.org
 - [3] https://github.com/SHoltzen/dice/
+
+
+# FAQ
+
+* Q: I got a `FileNotFoundError: [Errno 2] No such file or directory: 'dice'` error!
+  
+  A: Please run `eval $(opam env)` and then try again.
+* Q: How can I install things in the docker image?
+   
+   A: Use `apt-get`, for instance `apt-get install vim`
