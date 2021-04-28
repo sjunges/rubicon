@@ -1,0 +1,297 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{tikz}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{pgfplots}
+\usepackage{graphicx}
+\usepackage{tikz-cd}
+\usepackage{paralist}
+\usepackage{booktabs}
+\usepackage{colonequals}
+\usepackage[inline]{enumitem}
+
+\newcommand{\prism}{\textsc{Prism}}
+\newcommand{\modest}{\textsc{Modest}}
+\newcommand{\jani}{\textsc{JANI}}
+\newcommand{\rubicon}{\textsc{Rubicon}}
+\newcommand{\storm}{\textsc{Storm}}
+\newcommand{\epmc}{\textsc{EPMC}}
+\newcommand{\pgcl}{\textsc{PGCL}}
+\newcommand{\true}{\texttt{true}}
+\newcommand{\false}{\texttt{false}}
+\newcommand{\dice}{\texttt{Dice}}
+\newcommand{\readcmd}{\texttt{read}}
+\newcommand{\writecmd}{\texttt{write}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RRnn}{\mathbb{R}_{\geq 0}}
+\newcommand{\fixdeadlock}{\texttt{fixdl}}
+\newcommand{\prog}{\mathcal{P}}
+\newcommand{\Cmd}{\mathsf{Cmd}}
+\newcommand{\Vars}{\mathsf{Var}}
+\newcommand{\valmap}{\mathsf{val}}
+\newcommand{\varmap}{\mathsf{var}} 
+\newcommand{\weight}{\mathsf{weight}}
+\newcommand{\program}[1][]{\mathcal{P}}
+\newcommand{\semantics}[1]{[\![\, #1 \, ]\!]}
+\newcommand{\globally}{\square}
+\newcommand{\eventuallyb}[1]{\lozenge^{\leq #1}}
+\newcommand{\eventually}{\lozenge}
+\newcommand{\mc}{\mathcal{M}}
+\newcommand{\Distr}{\ensuremath{Distr}}
+\newcommand{\last}[1]{\ensuremath{#1_\downarrow}}
+\newcommand{\ct}[2]{\ensuremath{\mathsf{CT}(#1,#2)}}
+\newcommand{\Succ}{\ensuremath{\mathsf{Succ}}}
+\newcommand{\bisim}{\sim}
+\newcommand{\reorder}{\eqcirc}
+\newcommand{\heads}{\top}
+\newcommand{\tails}{\bot}
+\newcommand{\bdd}[2]{\mathsf{BDD}(#1, #2)}
+\newcommand{\bddw}[3]{\mathsf{BDD}_\mathsf{MC}(#1, #2, #3)}
+\newcommand{\coinsweight}{W}
+\newcommand{\coins}{C}
+\newcommand{\coin}{c}
+\newcommand{\coinsorder}{\leqslant_\coins}
+\newcommand{\WMC}{\mathsf{WMC}}
+\newcommand{\seteventuallyb}[2]{\semantics{\eventuallyb{#1} #2}}
+\newcommand{\seteventuallybfrom}[3]{\semantics{#1{\rightarrow}\eventuallyb{#2} #3}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\hPaths}{\text{Paths}_h}
+\newcommand{\bool}{\{0, 1\}}
+
+
+\usetikzlibrary{patterns,arrows,backgrounds,calc,shapes,shadows,decorations.pathmorphing,decorations.pathreplacing,automata,shapes.multipart,positioning,shapes.geometric,fit,circuits,trees,shapes.gates.logic.US,fit,decorations.markings}
+
+\tikzset{sstate/.style={circle, draw=black, inner sep=1pt}}
+%
+\pgfplotstableread[col sep = comma]{fig1c.csv}\motiv
+\pgfplotstableread[col sep = comma]{fig9b.csv}\hermanthirteen % latex
+\pgfplotstableread[col sep = comma]{fig9c.csv}\hermanthirteenrandom % latex
+                               % forbids numbers here
+\pgfplotstableread[col sep = comma]{fig9d.csv}\hermanseventeen
+\pgfplotstableread[col sep = comma]{fig9e.csv}\hermanseventeenrandom
+\pgfplotstableread[col sep = comma]{fig9f.csv}\hermannineteen
+\pgfplotstableread[col sep = comma]{data/guy-mc.csv}\guymc
+\pgfplotstableread[col sep = comma]{fig9a.csv}\weather
+\pgfplotstableread[col sep = comma]{fig9g.csv}\queues
+
+
+
+
+\begin{document}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+   \begin{axis}[
+		height=3.5cm,
+   width=3cm,
+		grid=major,
+		ticklabel style = {font=\tiny},
+   xlabel={\# Parallel Chains},
+   ylabel={time in s},
+   y label style={at={(axis description cs:.4,.5)},,anchor=south},
+   legend style={at={(5em,5em)},anchor=north}
+   ]
+   \addplot[mark=none, mark = star] table [x index={0}, y index={2}] {\motiv}; \label{plt:rubicon}
+   \addplot[mark=none, red, mark = o ] table [x index={0}, y index={3}] {\motiv}; \label{plt:stormexpl}
+   \addplot[mark=none, blue, mark = square] table [x index={0}, y index={4}] {\motiv} ;\label{plt:stormsym}
+   % \addplot[mark=none, green,  thick, mark = diamond] table [x index={0}, y index={4}] {\motiv};\label{plt:prism}
+   
+
+ \end{axis}
+\end{tikzpicture}
+
+  \caption{Motivating example scaling}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+\subfigure[Weather Factory]{
+   \begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3.5cm,
+   % ymin=0,
+   % ymax=1000000,
+   ylabel={Time (s)},
+		grid=major,
+   xlabel={\# Factories},
+   legend style={at={(0em,10em)},anchor=north},
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\weather};\label{plt:rubicon1}
+   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\weather}; \label{plt:stormsym1}
+   \addplot[mark=star, thick, green] table [x index={0}, y index={3}] {\weather}; \label{plt:stormexp1}
+
+   % \addplot[mark=none, blue, thick] table [x index={0}, y index={3}] {\hermanthirteen}; 
+   % \addlegendentry{Storm (random)}
+ \end{axis}
+\end{tikzpicture}
+ \label{fig:expweather}
+}~
+  \subfigure[Herman-13]{
+ \centering
+ % \begin{subfigure}[b]{0.3\linewidth}
+     \begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3.5cm,
+   % ymin=0,
+   % ymax=1000000,
+		grid=major,
+   xlabel={Horizon $(h)$},
+   % legend columns = 4
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanthirteen};
+   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\hermanthirteen}; 
+   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanthirteen}; 
+
+
+ \end{axis}
+\end{tikzpicture}
+\label{fig:expherman13}
+}~
+  \subfigure[Herman-13 (R)]{
+ \centering
+ % \begin{subfigure}[b]{0.3\linewidth}
+     \begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3.5cm,
+   % ymin=0,
+   % ymax=1000000,
+		grid=major,
+   xlabel={Horizon $(h)$},
+   % legend columns = 4
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanthirteenrandom};
+   \addplot[mark=diamond, blue, red, thick] table [x index={0}, y index={3}] {\hermanthirteenrandom}; 
+   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanthirteenrandom}; 
+
+
+ \end{axis}
+\end{tikzpicture}
+\label{fig:expherman13random}
+}
+\\
+
+\vspace{-2mm}
+\subfigure[Herman-17]{
+\begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3.5cm,
+   % ymin=0,
+   % ymax=1000000,
+		grid=major,
+   xlabel={Horizon $(h)$},
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanseventeen};
+   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\hermanseventeen}; 
+   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanseventeen}; 
+
+% \node[draw, color=blue, fill=red, circle, scale=0.4] {};
+ \end{axis}
+\end{tikzpicture}
+\label{fig:expherman17}
+}~
+\subfigure[Herman-17 (R)]{
+\begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3.5cm,
+   % ymin=0,
+   % ymax=1000000,
+		grid=major,
+   xlabel={Horizon $(h)$},
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanseventeenrandom};
+   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\hermanseventeenrandom};
+   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanseventeenrandom}; 
+
+% \node[draw, color=blue, fill=red, circle, scale=0.4] {};
+ \end{axis}
+\end{tikzpicture}
+\label{fig:expherman17random}
+}
+~
+\subfigure[Herman-19 (R)]{
+\begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3cm,
+   % ymin=0,
+   % ymax=1000000,
+		grid=major,
+   xlabel={Horizon $(h)$},
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermannineteen};
+   \addplot[mark=star, green, thick] table [x index={0}, y index={3}] {\hermannineteen}; 
+
+% \node[draw, color=blue, fill=red, circle, scale=0.4] {};
+ \end{axis}
+\end{tikzpicture}
+\label{fig:expherman19}
+}
+%~
+\subfigure[Queues]{
+\begin{tikzpicture}
+   \begin{axis}[
+		height=3cm,
+   width=3.5cm,
+   % ymin=0,
+   % ymax=1000000,
+		grid=major,
+   xlabel={Horizon $(h)$},
+   ]
+   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\queues};
+   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\queues};
+   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\queues}; 
+
+% \node[draw, color=blue, fill=red, circle, scale=0.4] {};
+ \end{axis}
+\end{tikzpicture}
+\label{fig:queues}
+}
+\vspace{-2mm}
+% \subfigure[Guy-MC]{
+%   \begin{tikzpicture}
+%    \begin{axis}[
+% 		height=3.5cm,
+%    width=3.5cm,
+%    % ymin=0,
+%    % ymax=1000000,
+% 		grid=major,
+%    xlabel={Horizon $(h)$},
+%    ]
+%    \addplot[mark=none, thick] table [x index={0}, y index={1}] {\guymc};
+%    \addplot[mark=none, thick, red] table [x index={0}, y index={2}] {\guymc}; 
+%    % \addplot[mark=none, blue, thick] table [x index={0}, y index={3}] {\hermanthirteen}; 
+%    % \addlegendentry{Storm (random)}
+%  \end{axis}
+% \end{tikzpicture}
+% }
+\caption{Scaling plots comparing \rubicon{} (\ref{plt:rubicon1}), \storm{}'s
+  symbolic engine (\ref{plt:stormsym1}), and \storm{}'s explicit engine (\ref{plt:stormexp1}).
+An ``(R)'' in the caption denotes random parameters.
+}
+\label{fig:scaling}
+\end{figure}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
