@@ -9,9 +9,12 @@ This prototype uses (the python bindings of) Storm [2] to model check finite hor
 ## Running Rubicon inside a Docker container
 
 We provide a docker container
-
 ```
 docker pull sjunges/rubicon:cav21
+```
+or when downloaded from an (unpacked) archive:
+```
+docker load -i rubicon_docker.tar
 ```
 
 The container is based on an container for the probabilistic model checker as provided by the storm developers, 
@@ -78,7 +81,7 @@ First, inside the Docker container,
 set up the environment by executing:
 
 ```
-    eval $(opam env)
+eval $(opam env)
 ```
 
 ### Recreating the Figures and Tables in the Paper
