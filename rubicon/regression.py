@@ -58,15 +58,22 @@ class RubiconContext:
             ids.append("dice")
         for wrapper in self.storm_wrappers:
             ids.append(wrapper.id)
+        return ids
 
     def finalize(self):
         if self.csv_path is not None:
             logger.info(f"Export stats to {self.csv_path}")
             with open(self.csv_path, 'w') as file:
-                file.write("family, instance, dice-time, dice-result, storm-time, storm-result\n")
+                file.write("family, instance")
+                if self.dice_wrapper is not None:
+                    file.write(",dice-time,dice-result")
+                for wrapper in self.storm_wrappers:
+                    file.write(f",{wrapper.id}-time,{wrapper.id}-result")
+                file.write("\n")
+
                 for stats in self._all_stats:
                     row = [stats["family"], ";".join([f"{k}={v}" for k,v in stats["identifiers"].items()])]
-                    for tool in ["dice","storm"]:
+                    for tool in self._tool_ids():
                         if tool in stats:
                             row.append("{:.2f}".format(float(stats[tool]["total_time"])))
                             row.append("{:.5f}".format(float(stats[tool]["result"])))

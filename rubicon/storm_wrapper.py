@@ -9,7 +9,9 @@ class Storm:
     def __init__(self, cwd, path, arguments, symbolic):
         self._path = path.split(" ")
         self._cwd = cwd
-        self._id = "storm-" + "-dd-" if symbolic else "-sparse-" + "-".join(arguments)
+        self._id = "storm" + ("-dd" if symbolic else "-sparse")
+        if len(arguments) > 0:
+            self._id += "-" + "-".join(arguments)
         if arguments is None:
             self._arguments = ['-tm', '--sylvan:threads', '1']
         else:
