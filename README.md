@@ -43,7 +43,7 @@ eval $(opam env)
 ```
 
 ### Recreating the Figures and Tables in the Paper
-The following commands each generate a CSV file that contains the data that is used to generate each figure. 
+The following commands each generate a CSV file that contains the data that is used to generate each figure. All experiments are run with a default timeout of 1000 seconds; if the time to run the experiment exceeds this amount then the time and final result will both be reported as `-1`.
 
 To generate a CSV file for **Figure 1c**, please run:
 
