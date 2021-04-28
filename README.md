@@ -40,6 +40,7 @@ First and foremost, Rubicon translates Prism programs and properties to equivale
 ```
 python rubicon/rubicon.py --prism examples/factory/factory3.prism --prop 'P=? [F<=2 "allStrike"]' --output "factory-3-2.dice"
 ```
+This creates a dice file called `factory-3-2.dice`.
 Some files require additional constants to be set, as standard for prism files:
 ```
 python rubicon/rubicon.py --prism examples/parqueues/queue-8.nm --prop 'P=? [F<=8 "target"]' -const "N=4" --output "queue-8-4-8.dice"

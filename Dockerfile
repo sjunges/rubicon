@@ -31,3 +31,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN python setup.py install
+
+RUN mkdir /opt/rubicon/dice-examples
+RUN mkdir /opt/rubicon/factory
