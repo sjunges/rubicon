@@ -17,9 +17,12 @@ class Storm:
             self._arguments += ['-e', 'dd']
 
     def run(self, prism_path, prop, constants):
+        invocation = self._path + ["--prism", prism_path, "--prop", prop, "-const", constants] + self._arguments
         stats = dict()
         stats["file"] = prism_path
-        process = subprocess.Popen(self._path + ["--prism", prism_path, "--prop", prop, "-const", constants] + self._arguments, stdout=subprocess.PIPE,
+        logger.info("Run Storm... " + " ".join(invocation) + " from " + self._cwd)
+
+        process = subprocess.Popen(invocation, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, cwd=self._cwd)
         stdout, stderr = process.communicate()
         stdout = stdout.decode("utf-8")
