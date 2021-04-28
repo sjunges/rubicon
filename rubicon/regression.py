@@ -41,12 +41,13 @@ def get_output_path(family, filename):
 
 
 class RubiconContext:
-    def __init__(self, stats_path, csv_path):
+    def __init__(self, stats_path, csv_path, graph_csv):
         self.stats_path = stats_path
         self.csv_path = csv_path
         self.dice_wrapper = None
         self.storm_wrappers = []
         self._all_stats = []
+        self.graph_export_path = graph_csv
 
     def store_stats(self, stats_dict):
         self._all_stats.append(stats_dict)
@@ -62,6 +63,22 @@ class RubiconContext:
         return ids
 
     def finalize(self):
+        if self.graph_export_path is not None:
+            logger.info(f"Export graph data to {self.graph_export_path}")
+            # Notice that this part assumes that all benchmarks have the same instance fields
+            identifiers = self._all_stats[0]["identifiers"].keys()
+            with open(self.graph_export_path, 'w') as file:
+                file.write(",".join(identifiers))
+                for toolid in self._tool_ids():
+                    file.write(f",{toolid}-time")
+                file.write("\n")
+                for stat in self._all_stats:
+                    file.write(",".join([str(stat["identifiers"][ident]) for ident in identifiers]))
+                    for toolid in self._tool_ids():
+                        file.write(",")
+                        file.write(stat[toolid]["total_time"])
+                    file.write("\n")
+
         if self.csv_path is not None:
             logger.info(f"Export stats to {self.csv_path}")
             with open(self.csv_path, 'w') as file:
@@ -88,9 +105,10 @@ class RubiconContext:
 @click.group(chain=True)
 @click.option("--stats-file", default="stats.json")
 @click.option("--export-csv", help="path for csv output")
+@click.option("--graph-csv", help="path for plotting graphs")
 @click.pass_context
-def cli(ctx, stats_file, export_csv):
-    ctx.obj = RubiconContext(stats_file, export_csv)
+def cli(ctx, stats_file, export_csv, graph_csv):
+    ctx.obj = RubiconContext(stats_file, export_csv, graph_csv)
     return ctx
 
 @cli.command()
@@ -126,6 +144,14 @@ def include_storm(ctx, cwd, cmd, extra_arguments, add, timeout):
     storm = storm_wrapper.Storm(cwd, cmd, arguments, symbolic=add, timeout=timeout)
     ctx.obj.storm_wrappers.append(storm)
     return ctx
+
+
+@cli.command()
+@click.option("--x-axis")
+@click.pass_context
+def create_graph(ctx, x_axis):
+    ctx.obj.graph_exporter
+
 
 def _sample():
     res = 0.0
