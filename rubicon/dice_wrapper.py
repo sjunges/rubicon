@@ -38,3 +38,4 @@ class Dice:
             stats["total_time"] = "timeout"
             stats["result"] = "timeout"
             logger.info(f"Done: Result: {stats['result']}. Took {stats['total_time']}s")
+            return stats
