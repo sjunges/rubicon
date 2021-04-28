@@ -38,7 +38,7 @@ dice factory-15-sym.dice -inline-functions -time -param examples/factory-params/
 
 
 echo '================================================================================'
-echo 'Herman-13 Factory Compilation Time'
+echo 'Herman-13 Compilation Time'
 
 dice herman-13-sym.dice -inline-functions -time -skip-table
 
@@ -48,7 +48,7 @@ echo 'Herman-13 Total WMC'
 dice herman-13-sym.dice -inline-functions -time -param examples/herman-params/herman-13.dice.p-0.020.eval -param examples/herman-params/herman-13.dice.p-0.040.eval -param examples/herman-params/herman-13.dice.p-0.060.eval -param examples/herman-params/herman-13.dice.p-0.080.eval -param examples/herman-params/herman-13.dice.p-0.100.eval
 
 echo '================================================================================'
-echo 'Herman-17 Factory Compilation Time'
+echo 'Herman-17 Compilation Time'
 
 dice herman-17-sym.dice -inline-functions -time -skip-table
 

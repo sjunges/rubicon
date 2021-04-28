@@ -151,34 +151,37 @@ python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/r
 To generate this data we have provided a sample script that generates the parametric Markov chain files for dice. `/opt/rubicon` execute `./reference-scripts/symbolic.sh`, which will print something like the following output:
 
 ```
-./reference-scripts/symbolic.sh                                                                      
-Making symbolic dice files                                                                                                           
-2021-04-28 15:22:03,186 - __main__ - Translating examples/factory/factory15-par.prism to factory-15-sym.dice                         
-2021-04-28 15:22:03,306 - __main__ - Translating examples/factory/factory12-par.prism to factory-12-sym.dice                         
-Done making dice files, running benchmarks                                                                                           
-================================================================================                                                     
-12 Factory Compilation time                                                                                                          
-================[ Total time ]================                                                                                       
-0.17235994339                                                                                                                        
-================================================================================                                                     
-12 Factory Total WMC time                                                                                                            
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.0.eval') ]================       
-Value   Probability                                                                                                                  
-(true, true)    0.                                                                                                                   
-(true, false)   0.00177919660807                                                                                                     
-(false, true)   0.                                                                                                                   
-(false, false)  0.998220803392                                                                                                       
-                                                                                                                                     
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.1.eval') ]================       
-Value   Probability                                                                                                                  
-(true, true)    0.                                                                                                                   
-(true, false)   0.00270081926558                                                                                                     
-(false, true)   0.                                                                                                                   
-(false, false)  0.997299180734                                                                                                       
-                                                                                                                                     
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.2.eval') ]================       
-Value   Probability                                                                                                                  
-(true, true)    0.                                                                                                                   
+root@0eb42b351faa:/opt/rubicon# ./reference-scripts/symbolic.sh 
+Making symbolic dice files
+[WARNING] Running as root is not recommended
+2021-04-28 15:59:57,239 - __main__ - Translating examples/factory/factory15-par.prism to factory-15-sym.dice
+2021-04-28 15:59:57,365 - __main__ - Translating examples/factory/factory12-par.prism to factory-12-sym.dice
+2021-04-28 15:59:57,490 - __main__ - Translating examples/herman/herman-13-random-parametric.prism to herman-13-sym.dice
+2021-04-28 15:59:57,615 - __main__ - Translating examples/herman/herman-17-random-parametric.prism to herman-17-sym.dice
+Done making dice files, running benchmarks
+================================================================================
+12 Factory Compilation time
+================[ Total time ]================
+0.177648067474
+================================================================================
+12 Factory Total WMC time
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.0.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   0.00177919660807
+(false, true)   0.
+(false, false)  0.998220803392
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.1.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   0.00270081926558
+(false, true)   0.
+(false, false)  0.997299180734
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.2.eval') ]================
+Value   Probability
+(true, true)    0.
 (true, false)   4.80748360904e-05
 (false, true)   0.
 (false, false)  0.999951925164
@@ -198,57 +201,13 @@ Value   Probability
 (false, false)  0.999839298271
 
 ================[ Total time ]================
-2.63661408424
+2.38292193413
 ================================================================================
 15 Factory Compilation Time
-================[ Joint Distribution ]================
-Value   Probability
-(true, true)    0.
-(true, false)   0.
-(false, true)   0.
-(false, false)  1.
-
 ================[ Total time ]================
-10.2045600414
+2.58312606812
 ================================================================================
 15 Factory Total WMC
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.0.eval') ]================
-Value   Probability
-(true, true)    0.
-(true, false)   2.16835543163e-05
-(false, true)   0.
-(false, false)  0.999978316446
-
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.1.eval') ]================
-Value   Probability
-(true, true)    0.
-(true, false)   5.92110450432e-06
-(false, true)   0.
-(false, false)  0.999994078895
-
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.2.eval') ]================
-Value   Probability
-(true, true)    0.
-(true, false)   1.04345758491e-05
-(false, true)   0.
-(false, false)  0.999989565424
-
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.3.eval') ]================
-Value   Probability
-(true, true)    0.
-(true, false)   2.6302406621e-06
-(false, true)   0.
-(false, false)  0.999997369759
-
-================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.4.eval') ]================
-Value   Probability
-(true, true)    0.
-(true, false)   0.000143663463921
-(false, true)   0.
-(false, false)  0.999856336536
-
-================[ Total time ]================
-36.5432331562
 ```
 
 To interpret this output and build the table:
