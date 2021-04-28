@@ -40,10 +40,11 @@ def get_output_path(family, filename):
 
 
 class RubiconContext:
-    def __init__(self, stats_path, dice = None, storm = None):
+    def __init__(self, stats_path, csv_path):
         self.stats_path = stats_path
-        self.dice_wrapper = dice
-        self.storm_wrapper = storm
+        self.csv_path = csv_path
+        self.dice_wrapper = None
+        self.storm_wrappers = []
         self._all_stats = []
 
     def store_stats(self, stats_dict):
@@ -51,6 +52,30 @@ class RubiconContext:
         with open(self.stats_path, 'w') as file:
             json.dump(self._all_stats, file)
 
+    def _tool_ids(self):
+        ids = []
+        if self.dice_wrapper is not None:
+            ids.append("dice")
+        for wrapper in self.storm_wrappers:
+            ids.append(wrapper.id)
+
+    def finalize(self):
+        if self.csv_path is not None:
+            logger.info(f"Export stats to {self.csv_path}")
+            with open(self.csv_path, 'w') as file:
+                file.write("family, instance, dice-time, dice-result, storm-time, storm-result\n")
+                for stats in self._all_stats:
+                    row = [stats["family"], ";".join([f"{k}={v}" for k,v in stats["identifiers"].items()])]
+                    for tool in ["dice","storm"]:
+                        if tool in stats:
+                            row.append("{:.2f}".format(float(stats[tool]["total_time"])))
+                            row.append("{:.5f}".format(float(stats[tool]["result"])))
+                        else:
+                            row.append("")
+                            row.append("")
+                    file.write(",".join(row))
+
+                    file.write("\n")
 
 @click.group(chain=True)
 @click.option("--stats-file", default="stats.json")
@@ -87,30 +112,9 @@ def include_storm(ctx, cwd, cmd, extra_arguments, add):
     else:
         arguments = extra_arguments.strip().split(" ")
     storm = storm_wrapper.Storm(cwd, cmd, arguments, symbolic=add)
-    ctx.obj.storm_wrapper = storm
+    ctx.obj.storm_wrappers.append(storm)
+    return ctx
 
-
-#
-# for N in [3,10,100,1000]:
-#      for M in [3,10,100,1000]:
-#          rubicon.translate(get_examples_path("adversarialexample.prism"), "P=? [ F \"goal\" ]", f"N={N},M={M}", f"adv-grid-{N}-{M}-tg.dice",force_bounded=True, track_goal = True)
-#          rubicon.translate(get_examples_path("adversarialexample-c.prism"), "P=? [ F \"goal\" ]", f"N={N},M={M}",
-#                            f"adv-grid-c-{N}-{M}-tg.dice", force_bounded=True, track_goal = True)
-#
-# pvals = { "p" : [i * 0.02 for i in range(1,50)] }
-# for H in [1, 2, 3, 5, 10, 15, 20]:
-#     rubicon.translate(get_examples_path("herman-19.prism"), f"P=? [ F<={H} \"stable\" ]", f"", get_output_path(f"herman-19-H={H}.dice"), overlapping_guards=True, make_flat=False)
-#     rubicon.translate(get_examples_path("herman-19-random-input.prism"), f"P=? [ F<={H} \"stable\" ]", f"", get_output_path(f"herman-19-ri-H={H}.dice"), overlapping_guards=True, make_flat=False)
-
-#rubicon.translate(get_examples_path("herman-13.prism"), "P=? [ F<=20 \"stable\" ]", f"p={0.5}", "herman-13-tg-0.5.dice", overlapping_guards=True, make_flat=False, track_goal = True)
-#rubicon.translate(get_examples_path("herman-17.prism"), "P=? [ F<=20 \"stable\" ]", f"", "herman-17-tg.dice",parameter_instantiations=pvals, overlapping_guards=True, make_flat=False, track_goal = True)
-# rubicon.translate(get_examples_path("herman-pass-13.prism"), "P=? [ F<=20 \"stable\" ]", f"", "herman-pass-13.dice",parameter_instantiations=pvals, overlapping_guards=True, make_flat=False)
-# rubicon.translate(get_examples_path("herman-13.prism"), "P=? [ F<=5 \"stable\" ]", f"p=0.340", "herman-13-f.dice", overlapping_guards=True, make_flat=False)
-#
-#
-# rubicon.translate(get_examples_path("herman-13-random-input.prism"), "P=? [ F<=5 \"stable\" ]", f"", "herman-13-ri.dice", overlapping_guards=True, make_flat=False)
-#rubicon.translate(get_examples_path("herman-pass-13.prism"), "P=? [ F<=20 \"stable\" ]", f"", "herman-pass-13.dice", overlapping_guards=True, make_flat=False)
-#
 def _sample():
     res = 0.0
     while res == 0.0:
@@ -127,8 +131,8 @@ def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_
     stats["constants"] = consts
     if rubicon_context.dice_wrapper is not None:
         stats["dice"] = rubicon_context.dice_wrapper.run(dice_path)
-    if rubicon_context.storm_wrapper is not None:
-        stats["storm"] = rubicon_context.storm_wrapper.run(prism_path, prop, consts)
+    for wrapper in rubicon_context.storm_wrappers:
+        stats[wrapper.id] = wrapper.run(prism_path, prop, consts)
     rubicon_context.store_stats(stats)
 
 
@@ -243,13 +247,15 @@ def crowds(ctx, runs, crowdsize, horizon):
 
 
 @cli.command()
-@click.option("--n-values", "-N", type=click.Choice([4,6]), multiple=True, default=[4])
-@click.option("--k-values", "-K", type=click.Choice([2,8]), multiple=True, default=[2])
+@click.option("--n-values", "-N", type=click.Choice(['4','6']), multiple=True, default=['4'])
+@click.option("--k-values", "-K", type=click.Choice(['2','8']), multiple=True, default=['2'])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def leader(ctx, n_values, k_values, horizon):
     for N in n_values:
+        N = int(N)
         for K in k_values:
+            K = int(K)
             for H in horizon:
                 _run(ctx.obj, "leader", {"N": N, "K": K, "horizon": H}, get_examples_path("leader_sync", f"leader_synch_{N}_{K}.prism"), f"P=? [ F<={H} \"elected\" ]", "", get_output_path("leader_sync",  f"leader_sync_{N}_{K}-H={H}.dice"), make_flat=False, force_bounded=True)
 
