@@ -1,4 +1,4 @@
-TO="5"
+TO="100"
 echo "Run with TO = $TO seconds"
 
 eval $(opam env)
