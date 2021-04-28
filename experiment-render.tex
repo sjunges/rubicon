@@ -85,9 +85,11 @@
 \pgfplotstableread[col sep = comma]{fig9g.csv}\queues
 
 
-
+\title{Experiment Report}
+\author{Auto-generated}
 
 \begin{document}
+\maketitle
 
 \begin{figure}
   \centering
@@ -129,8 +131,8 @@
    legend style={at={(0em,10em)},anchor=north},
    ]
    \addplot[mark=square, thick] table [x index={0}, y index={2}] {\weather};\label{plt:rubicon1}
-   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\weather}; \label{plt:stormsym1}
-   \addplot[mark=star, thick, green] table [x index={0}, y index={3}] {\weather}; \label{plt:stormexp1}
+   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\weather}; \label{plt:stormexp1}
+   \addplot[mark=star, thick, green] table [x index={0}, y index={4}] {\weather}; \label{plt:stormsymb1}
 
    % \addplot[mark=none, blue, thick] table [x index={0}, y index={3}] {\hermanthirteen}; 
    % \addlegendentry{Storm (random)}
@@ -151,9 +153,9 @@
    xlabel={Horizon $(h)$},
    % legend columns = 4
    ]
-   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanthirteen};
-   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\hermanthirteen}; 
-   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanthirteen}; 
+   \addplot[mark=square, thick] table [x index={2}, y index={3}] {\hermanthirteen};
+   \addplot[mark=diamond, thick, red] table [x index={2}, y index={4}] {\hermanthirteen};
+   \addplot[mark=star, green, thick] table [x index={2}, y index={5}] {\hermanthirteen};
 
 
  \end{axis}
@@ -173,9 +175,9 @@
    xlabel={Horizon $(h)$},
    % legend columns = 4
    ]
-   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanthirteenrandom};
-   \addplot[mark=diamond, blue, red, thick] table [x index={0}, y index={3}] {\hermanthirteenrandom}; 
-   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanthirteenrandom}; 
+   \addplot[mark=square, thick] table [x index={2}, y index={3}] {\hermanthirteenrandom};
+   \addplot[mark=diamond, blue, red, thick] table [x index={2}, y index={4}] {\hermanthirteenrandom};
+   \addplot[mark=star, green, thick] table [x index={2}, y index={5}] {\hermanthirteenrandom};
 
 
  \end{axis}
@@ -195,9 +197,9 @@
 		grid=major,
    xlabel={Horizon $(h)$},
    ]
-   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanseventeen};
-   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\hermanseventeen}; 
-   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanseventeen}; 
+   \addplot[mark=square, thick] table [x index={2}, y index={3}] {\hermanseventeen};
+   \addplot[mark=diamond, thick, red] table [x index={2}, y index={4}] {\hermanseventeen};
+   \addplot[mark=star, green, thick] table [x index={2}, y index={5}] {\hermanseventeen};
 
 % \node[draw, color=blue, fill=red, circle, scale=0.4] {};
  \end{axis}
@@ -214,9 +216,9 @@
 		grid=major,
    xlabel={Horizon $(h)$},
    ]
-   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermanseventeenrandom};
-   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\hermanseventeenrandom};
-   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\hermanseventeenrandom}; 
+   \addplot[mark=square, thick] table [x index={2}, y index={3}] {\hermanseventeenrandom};
+   \addplot[mark=diamond, thick, red] table [x index={2}, y index={4}] {\hermanseventeenrandom};
+   \addplot[mark=star, green, thick] table [x index={2}, y index={5}] {\hermanseventeenrandom};
 
 % \node[draw, color=blue, fill=red, circle, scale=0.4] {};
  \end{axis}
@@ -234,8 +236,8 @@
 		grid=major,
    xlabel={Horizon $(h)$},
    ]
-   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\hermannineteen};
-   \addplot[mark=star, green, thick] table [x index={0}, y index={3}] {\hermannineteen}; 
+   \addplot[mark=square, thick] table [x index={2}, y index={3}] {\hermannineteen};
+   \addplot[mark=star, green, thick] table [x index={2}, y index={5}] {\hermannineteen};
 
 % \node[draw, color=blue, fill=red, circle, scale=0.4] {};
  \end{axis}
@@ -253,9 +255,9 @@
 		grid=major,
    xlabel={Horizon $(h)$},
    ]
-   \addplot[mark=square, thick] table [x index={0}, y index={2}] {\queues};
-   \addplot[mark=diamond, thick, red] table [x index={0}, y index={3}] {\queues};
-   \addplot[mark=star, green, thick] table [x index={0}, y index={4}] {\queues}; 
+   \addplot[mark=square, thick] table [x index={2}, y index={3}] {\queues};
+   \addplot[mark=diamond, thick, red] table [x index={2}, y index={4}] {\queues};
+   \addplot[mark=star, green, thick] table [x index={2}, y index={5}] {\queues};
 
 % \node[draw, color=blue, fill=red, circle, scale=0.4] {};
  \end{axis}
@@ -280,8 +282,8 @@
 %  \end{axis}
 % \end{tikzpicture}
 % }
-\caption{Scaling plots comparing \rubicon{} (\ref{plt:rubicon1}), \storm{}'s
-  symbolic engine (\ref{plt:stormsym1}), and \storm{}'s explicit engine (\ref{plt:stormexp1}).
+\caption{Scaling plots comparing \rubicon{} (\ref{plt:rubicon1}, black squares), \storm{}'s
+  symbolic engine (\ref{plt:stormsym1}, red diamonds), and \storm{}'s explicit engine (\ref{plt:stormexp1}, green stars).
 An ``(R)'' in the caption denotes random parameters.
 }
 \label{fig:scaling}
