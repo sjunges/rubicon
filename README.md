@@ -148,6 +148,107 @@ python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/r
 
 **Table 1 (left column)**:
 
+```
+./reference-scripts/symbolic.sh                                                                      
+Making symbolic dice files                                                                                                           
+2021-04-28 15:22:03,186 - __main__ - Translating examples/factory/factory15-par.prism to factory-15-sym.dice                         
+2021-04-28 15:22:03,306 - __main__ - Translating examples/factory/factory12-par.prism to factory-12-sym.dice                         
+Done making dice files, running benchmarks                                                                                           
+================================================================================                                                     
+12 Factory Compilation time                                                                                                          
+================[ Total time ]================                                                                                       
+0.17235994339                                                                                                                        
+================================================================================                                                     
+12 Factory Total WMC time                                                                                                            
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.0.eval') ]================       
+Value   Probability                                                                                                                  
+(true, true)    0.                                                                                                                   
+(true, false)   0.00177919660807                                                                                                     
+(false, true)   0.                                                                                                                   
+(false, false)  0.998220803392                                                                                                       
+                                                                                                                                     
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.1.eval') ]================       
+Value   Probability                                                                                                                  
+(true, true)    0.                                                                                                                   
+(true, false)   0.00270081926558                                                                                                     
+(false, true)   0.                                                                                                                   
+(false, false)  0.997299180734                                                                                                       
+                                                                                                                                     
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.2.eval') ]================       
+Value   Probability                                                                                                                  
+(true, true)    0.                                                                                                                   
+(true, false)   4.80748360904e-05
+(false, true)   0.
+(false, false)  0.999951925164
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.3.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   2.53134737218e-05
+(false, true)   0.
+(false, false)  0.999974686526
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-12-H=5.dice.4.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   0.000160701728645
+(false, true)   0.
+(false, false)  0.999839298271
+
+================[ Total time ]================
+2.63661408424
+================================================================================
+15 Factory Compilation Time
+================[ Joint Distribution ]================
+Value   Probability
+(true, true)    0.
+(true, false)   0.
+(false, true)   0.
+(false, false)  1.
+
+================[ Total time ]================
+10.2045600414
+================================================================================
+15 Factory Total WMC
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.0.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   2.16835543163e-05
+(false, true)   0.
+(false, false)  0.999978316446
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.1.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   5.92110450432e-06
+(false, true)   0.
+(false, false)  0.999994078895
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.2.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   1.04345758491e-05
+(false, true)   0.
+(false, false)  0.999989565424
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.3.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   2.6302406621e-06
+(false, true)   0.
+(false, false)  0.999997369759
+
+================[ Joint Distribution (Substituting 'examples/factory-params/factory-par-15-H=5.dice.4.eval') ]================
+Value   Probability
+(true, true)    0.
+(true, false)   0.000143663463921
+(false, true)   0.
+(false, false)  0.999856336536
+
+================[ Total time ]================
+36.5432331562
+```
+
 **Table 1 (middle column)**: 
 From the following output of storm, we distilled the build and model checking times.
 ```
