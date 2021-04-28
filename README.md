@@ -90,6 +90,7 @@ To easily execute all the commands in this section with a 100-second timeout, fr
 ./reference-scripts/scaling.sh
 ./reference-scripts/symbolic.sh
 ```
+Together these commands can take hours to run. To speed things up, you can replace the timeouts in `scaling.sh` with your preferred timeout in seconds.
 We now go through these commands step by step.
 
 The following commands each generate a CSV file that contains the data that is used to generate each figure. All experiments are run with a default timeout of 1800 seconds; if the time to run the experiment exceeds this amount then the time and final result will both be reported as `-1`.
