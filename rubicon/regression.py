@@ -143,6 +143,7 @@ def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_
 @click.pass_context
 def factory_parametric(ctx, nr_factories, horizon):
     for N in nr_factories:
+        N = int(N)
         pvals = [{**{f"p{n}": _sample() for n in range(1, N + 1)}, **{f"q{n}": _sample() for n in range(1, N + 1)}} for _
                  in range(5)]
         for H in horizon:

@@ -95,7 +95,7 @@ def compute_model_parameters(program, props, compute_prob0_expressions = True):
             assert False
 
     for k, v in subst.items():
-        print("{} -> {}".format(k.name, v))
+        logger.debug("Parameter substitution: {} -> {}".format(k.name, v))
 
     if compute_prob0_expressions:
         prob0expressions = []
@@ -224,7 +224,7 @@ def translate_prism(flat_program, props, step_bound, maxintval, prob0expressions
                     if len(indexname) > 20:
                         indexname = str(id)
                     with open(output_path + "." + indexname + ".eval", 'w') as file:
-                        print(assignment)
+                        logger.debug("Create evaluation file")
                         evaluation_dict = {prob_parameters[p]: expr_manager.create_rational(stormpy.Rational(v)) for p,v in assignment.items()}
                         comments = False
                         if comments:
