@@ -19,10 +19,15 @@ see [this documentation](https://www.stormchecker.org/documentation/obtain-storm
 
 The following command will run the docker container (for Windows platforms, please see the documentation from the storm website).
 ```
-docker run --mount type=bind,source="$(pwd)",target=/data -w /opt/rubicon --rm -it --name rubicon sjunges/rubicon:cav21
+docker run --mount type=bind,source="$(pwd)",target=/data -w /opt/rubicon -it --name rubicon sjunges/rubicon:cav21
 ```
 To export files out of the Docker image,
 files that are in the `/data` directory inside the image are available on the host system in the current working directory.
+
+**Note** 
+This docker container may yield difficulties running on the new Mac M1 Chipset. 
+The [following link](https://docs.docker.com/docker-for-mac/apple-silicon/) shows how to run this docker in emulation, and may resolve these issues.
+
 
 ## Installation Procedure
 
@@ -40,7 +45,7 @@ First and foremost, Rubicon translates Prism programs and properties to equivale
 ```
 python rubicon/rubicon.py --prism examples/factory/factory3.prism --prop 'P=? [F<=2 "allStrike"]' --output "factory-3-2.dice"
 ```
-This creates a dice file called `factory-3-2.dice`.
+Rubicon will give limited logging output and creates a dice file called `factory-3-2.dice`.
 Some files require additional constants to be set, as standard for prism files:
 ```
 python rubicon/rubicon.py --prism examples/parqueues/queue-8.nm --prop 'P=? [F<=8 "target"]' -const "N=4" --output "queue-8-4-8.dice"
@@ -54,6 +59,8 @@ Then:
 ```
 python rubicon/rubicon.py --prism examples/factory/factory3.prism --prop 'P=? [F<=2 "allStrike"]' --output "factory-3-2.dice" --run-dice 
 ```
+This provides logging output and includes the resulting probability on the last line.
+
 We provide a couple of arguments to set-up Dice:
 - `--dice-cwd` The working directory from which to run Dice. Defaults to `.`.
 - `--dice-cmd` The command with which to invoke dice, defaults to `dice`.
@@ -71,7 +78,7 @@ First, inside the Docker container,
 set up the environment by executing:
 
 ```
-eval $(opam env)
+    eval $(opam env)
 ```
 
 ### Recreating the Figures and Tables in the Paper
@@ -80,6 +87,7 @@ To easily execute all the commands in this section with a 100-second timeout, fr
 ./reference-scripts/scaling.sh
 ./reference-scripts/symbolic.sh
 ```
+We now go through these commands step by step.
 
 The following commands each generate a CSV file that contains the data that is used to generate each figure. All experiments are run with a default timeout of 1800 seconds; if the time to run the experiment exceeds this amount then the time and final result will both be reported as `-1`.
 
