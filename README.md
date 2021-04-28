@@ -134,3 +134,7 @@ docker build --tag rubicon:1.0 .
 * Q: How can I install things in the docker image?
    
    A: Use `apt-get`, for instance `apt-get install vim`
+
+* Q: Help I got `docker: Got permission denied while trying to connect to the Docker daemon socket`
+
+  A: Run docker using administrative rights (`sudo`)
