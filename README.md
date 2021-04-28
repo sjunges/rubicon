@@ -84,10 +84,6 @@ python rubicon/regression.py --export-csv "fig1c.csv" include-dice --cwd "/opt/r
 ```
 This will create a series of benchmark evaluations with horizon 10 (`-H 10`) and 8, 10, 13, 15, 17, and 19 parallel factories. This generates a file `fig1c.csv` which has the following contents (note that precise numbers may vary due to differences in the running environment, but the important thing is that the relative trend of rubicon scaling to more states holds):
 ```
-family, instance, dice-time, dice-result, storm-time, storm-result
-factory,N=5;horizon=10,0.01,0.04459,0.02,0.04459
-factory,N=9;horizon=10,0.04,0.00054,0.19,0.00054
-factory,N=12;horizon=10,0.54,0.00003,12.84,0.00003
 ...
 ```
 
