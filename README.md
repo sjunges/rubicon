@@ -148,7 +148,8 @@ python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/r
 
 **Table 1 (left column)**:
 
-To generate this data we have provided a sample script that generates the parametric Markov chain files for dice. `/opt/rubicon` execute `./reference-scripts/symbolic.sh`, which will print something like the following output:
+Inside `/opt/rubicon` execute `./reference-scripts/symbolic.sh`, which will
+print something like the following output:
 
 ```
 root@0eb42b351faa:/opt/rubicon# ./reference-scripts/symbolic.sh 
