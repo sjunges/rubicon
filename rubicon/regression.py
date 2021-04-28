@@ -141,7 +141,6 @@ def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_
     stats["prism_path"] = prism_path
     stats["prop"] = prop
     stats["constants"] = consts
-    print(",".join([f"{k}={v}" for k,v in parameter_instantiations[0].items()]))
     if rubicon_context.dice_wrapper is not None:
         stats["dice"] = rubicon_context.dice_wrapper.run(dice_path)
     if len(parameter_instantiations) > 0 and len(rubicon_context.storm_wrappers) > 0:
@@ -167,7 +166,7 @@ def factory_parametric(ctx, nr_factories, horizon):
 
 
 @cli.command()
-@click.option("--nr_factories", "-N", type=click.IntRange(8,25), multiple=True, default=[10])
+@click.option("--nr_factories", "-N", type=click.IntRange(5,25), multiple=True, default=[10])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def factory(ctx, nr_factories, horizon):

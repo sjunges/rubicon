@@ -1,6 +1,8 @@
 import itertools
 import re
 import math
+import os
+import dice_wrapper
 
 import click
 import stormpy
@@ -10,13 +12,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 @click.command()
-@click.option('--model', help='The model to translate')
-@click.option('--property', help='Property file.')
-@click.option('--constants', help="Constants")
-@click.option('--output', help="")
-def translate_cli(model, property, constants, output):
+@click.option('--prism', help='The model to translate', required=True)
+@click.option('--prop', help='Property file.', required=True)
+@click.option('--constants', '-const', help="Constants", default="")
+@click.option('--output', help="Output dice file", default="tmp.dice")
+@click.option('--run-dice', is_flag=True, help="Should dice be invoked directly?")
+@click.option('--dice-cmd', default="dice")
+@click.option('--dice-cwd', default=".")
+@click.option("--dice-args", default="")
+@click.option("--dice-to", default=1800, type=int)
+def translate_cli(prism, prop, constants, output, run_dice, dice_cmd, dice_cwd, dice_args, dice_to):
     """Generate Dice Programs from the cli"""
-    translate(model, property, constants, output)
+    translate(prism, prop, constants, output)
+    if run_dice:
+        dice = dice_wrapper.Dice(dice_cwd, dice_cmd, dice_args.split(), dice_to)
+        dice.run(os.path.abspath(output))
+
 
 def translate(model, property, constants, output, parameter_instantiations = dict(), overlapping_guards=True, make_flat = False, force_bounded = True, track_goal = False, force_max_int_val = 0):
     logger.info(f"Translating {model} to {output}")
@@ -44,6 +55,7 @@ def translate(model, property, constants, output, parameter_instantiations = dic
 
     translate_prism(program, props, step_bound, maxintval, prob0expressions, output, parameter_instantiations, has_overlapping_guards=overlapping_guards, track_goal=track_goal)
 
+
 def load_prism_program(model_path, property_string, constants_string):
     program = stormpy.parse_prism_program(model_path)
     expr_manager = program.expression_manager
@@ -55,6 +67,7 @@ def load_prism_program(model_path, property_string, constants_string):
     program = program.substitute_constants()
     props = stormpy.parse_properties_for_prism_program(property_string, program)
     return program, props
+
 
 def compute_model_parameters(program, props, compute_prob0_expressions = True):
     model = stormpy.build_symbolic_model(program.substitute_nonstandard_predicates(), props)
@@ -113,19 +126,23 @@ def compute_model_parameters(program, props, compute_prob0_expressions = True):
         prob0expressions = ["false"]
     return model_depth, prob0expressions
 
+
 def make_program_flat(program):
     flat_program = program.flatten().simplify()
     flat_program = flat_program.substitute_formulas().substitute_constants().simplify()
     return flat_program
 
+
 class ActionIndex:
     def __init__(self, index):
         self.index = index
+
 
 class CommandIndex:
     def __init__(self, index, command):
         self.index = index
         self.command = command
+
 
 class SymbDistribution:
     def __init__(self, probs):
@@ -359,6 +376,7 @@ def translate_prism(flat_program, props, step_bound, maxintval, prob0expressions
             for v in m.integer_variables:
                 step_arguments.append(v.expression_variable)
                 #TODO handle non-zero lower bounds
+                assert int(str(v.lower_bound_expression)) == 0
                 step_argument_strings.append(f"{v.expression_variable.name} : int({v.upper_bound_expression})")
                 step_argument_types.append(f"int({maxintval})")
                 step_initial_values.append(f"int({maxintval},{v.initial_value_expression})")
@@ -625,8 +643,6 @@ def translate_prism(flat_program, props, step_bound, maxintval, prob0expressions
                         assert len(updated_by_module) > 0
                         unpack_to_file(f"_result_{module_index}", updated_by_module, "\t\t\t\t", suffix="_prime")
 
-
-
                     primed_vars = [x.name + ("_prime" if x in updated else "") for x in step_arguments]
                     file.write(f"\t\t\t\t{pack(primed_vars)}\n")
                     else_str = "else "
@@ -722,19 +738,21 @@ def translate_prism(flat_program, props, step_bound, maxintval, prob0expressions
         else:
             file.write("(hit(res), {})".format(prob0expressions[-1]))
 
+
 if __name__ == '__main__':
-    logger.setLevel(logging.DEBUG)
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
 
     # create console handler and set level to debug
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(logging.INFO)
 
     # create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
 
     # add formatter to ch
     ch.setFormatter(formatter)
 
     # add ch to logger
-    logger.addHandler(ch)
+    root.addHandler(ch)
     translate_cli()
