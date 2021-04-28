@@ -148,6 +148,8 @@ python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/r
 
 **Table 1 (left column)**:
 
+To generate this data we have provided a sample script that generates the parametric Markov chain files for dice. `/opt/rubicon` execute `./reference-scripts/symbolic.sh`, which will print something like the following output:
+
 ```
 ./reference-scripts/symbolic.sh                                                                      
 Making symbolic dice files                                                                                                           
@@ -248,6 +250,8 @@ Value   Probability
 ================[ Total time ]================
 36.5432331562
 ```
+
+
 
 **Table 1 (middle column)**: 
 From the following output of storm, we distilled the build and model checking times.
