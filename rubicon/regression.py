@@ -176,25 +176,27 @@ def weatherfactory(ctx, nr_factories, horizon):
 
 
 @cli.command()
-@click.option("--nr-queues", "-Q", type=click.Choice([8, 9, 10]), multiple=True, default=[8])
+@click.option("--nr-queues", "-Q", type=click.Choice(['8', '9', '10']), multiple=True, default=['8'])
 @click.option("--nr-elements", "-N", type=click.IntRange(2,None), multiple=True, default=[3])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def parqueues(ctx, nr_queues, nr_elements, horizon):
     for K in nr_queues:
-         for N in nr_elements:
+        K = int(K)
+        for N in nr_elements:
              for H in horizon:
                  _run(ctx.obj,  "parqueues", {"K": K, "N": N, "horizon": H}, get_examples_path("parqueues", f"queue-{K}.nm"), f"P=? [ F<={H} \"target\" ]", f"N={N}", get_output_path("parqueues", f"queues-{K}-{N}-H={H}.dice"), force_bounded=True)
     return ctx
 
 
 @cli.command()
-@click.option("--nr-stations", "-N", type=click.Choice([13, 15, 17, 19]), multiple=True, default=[13])
+@click.option("--nr-stations", "-N", type=click.Choice(['13', '15', '17', '19']), multiple=True, default=['13'])
 @click.option("--asym", is_flag=True, help="Are the station probabilities asymmetric?")
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def herman(ctx, nr_stations, asym, horizon):
     for N in nr_stations:
+        N = int(N)
         for H in horizon:
             if asym:
                 _run(ctx.obj, "herman", {"asym": True, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}-random-input.prism"), f"P=? [ F<={H} \"stable\" ]", f"",
@@ -202,6 +204,29 @@ def herman(ctx, nr_stations, asym, horizon):
             else:
                 _run(ctx.obj, "herman", {"asym": False, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}.prism"), f"P=? [ F<={H} \"stable\" ]", f"", get_output_path("herman", f"herman-{N}-H={H}.dice"), overlapping_guards=True)
     return ctx
+
+@cli.command()
+@click.option("--nr-stations", "-N", type=click.Choice(['13', '17', '19']), multiple=True, default=['13'])
+@click.option("--asym", is_flag=True, help="Are the station probabilities asymmetric?")
+@click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
+@click.pass_context
+def herman_parametric(ctx, nr_stations, asym, horizon):
+    if not asym:
+        raise RuntimeError("Only the asymmetric model is currently implemented. Add --asym to herman_parametric")
+    for N in nr_stations:
+        N = int(N)
+        pvals = [{**{f"p{n}": _sample() for n in range(1, N + 1)}} for
+                 _
+                 in range(5)]
+
+        for H in horizon:
+            if asym:
+                _run(ctx.obj, "herman", {"asym": True, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}-random-parametric.prism"), f"P=? [ F<={H} \"stable\" ]", f"",
+                     get_output_path("herman", f"herman-ri-par-{N}-H={H}.dice"), parameter_instantiations=pvals, overlapping_guards=True)
+            else:
+                assert False, "Should be caught by previous check"
+    return ctx
+
 
 
 @cli.command()
