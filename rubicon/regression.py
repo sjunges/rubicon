@@ -141,26 +141,28 @@ def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_
     stats["prism_path"] = prism_path
     stats["prop"] = prop
     stats["constants"] = consts
+    print(",".join([f"{k}={v}" for k,v in parameter_instantiations[0].items()]))
     if rubicon_context.dice_wrapper is not None:
         stats["dice"] = rubicon_context.dice_wrapper.run(dice_path)
-    if len(parameter_instantiations) > 0 and len(rubicon_context.storm_wrappers):
-        print("Warning, this script does not support parametric capabilities of storm.")
+    if len(parameter_instantiations) > 0 and len(rubicon_context.storm_wrappers) > 0:
+        raise RuntimeError("Warning, this script does not support parametric capabilities of storm.")
     for wrapper in rubicon_context.storm_wrappers:
         stats[wrapper.id] = wrapper.run(prism_path, prop, consts)
     rubicon_context.store_stats(stats)
 
 
 @cli.command()
-@click.option("--nr_factories", "-N", type=click.Choice(['10', '12', '15']), multiple=True, default=['10'])
+@click.option("--nr_factories", "-N", type=click.Choice(['5', '10', '12', '15']), multiple=True, default=['10'])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def factory_parametric(ctx, nr_factories, horizon):
     for N in nr_factories:
+        N = int(N)
         pvals = [{**{f"p{n}": _sample() for n in range(1, N + 1)}, **{f"q{n}": _sample() for n in range(1, N + 1)}} for _
                  in range(5)]
-
+        print(pvals)
         for H in horizon:
-            rubicon.translate(get_examples_path(f"factory{N}-par.prism"), f"P=? [ F<={H} \"allStrike\"]", "", get_output_path(f"factory-{N}-H={H}.dice"), parameter_instantiations=pvals)
+            _run(ctx.obj, "factory", {"N": N, "horizon": H}, get_examples_path("factory", f"factory{N}-par.prism"), f"P=? [ F<={H} \"allStrike\"]", "", get_output_path("factory", f"factory-{N}-H={H}.dice"), parameter_instantiations=pvals)
     return ctx
 
 
@@ -226,7 +228,7 @@ def herman(ctx, nr_stations, asym, horizon):
 @click.pass_context
 def herman_parametric(ctx, nr_stations, asym, horizon):
     if not asym:
-        raise RuntimeError("We currently only integrated an asymetric version of parametric herman")
+        raise RuntimeError("We currently only integrated an asymetric version of parametric herman. Add --asym")
     for N in nr_stations:
         N = int(N)
         pvals = [{**{f"p{n}": _sample() for n in range(1, N + 1)}} for
