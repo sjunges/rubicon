@@ -101,9 +101,19 @@ python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/r
 
 **Table 1 (left column)**:
 
-**Table 1 (middle column)**:
+**Table 1 (middle column)**: 
+From the following output of storm, we distilled the build and model checking times.
+```
+./reference_scripts/storm-sample-add.sh /opt/storm/build/ experiments/ 1800
+```
+(Notice that we add a small example to test our setup)
 
 **Table 1 (right column)**:
+From the following output of storm, we concluded all benchmarks timed out. 
+```
+./reference_scripts/storm-solution-function.sh /opt/storm/build/ experiments/ 1800
+```
+(Notice that we add a small example to test our setup)
 
 ### More examples
 
