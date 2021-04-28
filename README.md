@@ -208,9 +208,16 @@ Value   Probability
 2.58312606812
 ================================================================================
 15 Factory Total WMC
+...
 ```
 
 To interpret this output and build the table:
+
+* The "Rubicon build" sub-column is read off of the "Compilation Time" timing results. For instance, in the above, the "Factories 12 rubicon build time" is `0.177648067474`.
+* The "Rubicon WMC" time is retrieved by subtracting the total time by the compilation time and then dividing by 5. For instance, the "Factories 12 WMC Time" entry is computed as `(2.38292193413 - 0.17776)/ 5 =0.441032387`.
+
+
+Note again that there may be slight differences in timings between these exact results and  those in the paper due to differing environments.
 
 **Table 1 (middle column)**: 
 From the following output of storm, we distilled the build and model checking times.
