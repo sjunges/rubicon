@@ -66,8 +66,35 @@ python rubicon/regression.py --export-csv "fig9a.csv" include-dice --cwd "/opt/r
 
 **Figure 9b**:
 ```
-
+python rubicon/regression.py --export-csv "fig9b.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 13 -H 10 -H 20 -H 30 -H 40
 ```
+
+**Figure 9c**:
+```
+python rubicon/regression.py --export-csv "fig9c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 13 -H 10 -H 20 -H 30 -H 40 --asym
+```
+
+**Figure 9d**:
+```
+python rubicon/regression.py --export-csv "fig9d.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 17 -H 10 -H 20 -H 30 -H 40
+```
+
+**Figure 9e**:
+```
+python rubicon/regression.py --export-csv "fig9e.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 17 -H 10 -H 20 -H 30 -H 40 --asym
+```
+
+**Figure 9f**:
+```
+python rubicon/regression.py --export-csv "fig9f.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 19 -H 10 -H 20 -H 30 -H 40
+```
+
+**Figure 9g**:
+```
+python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 19 -H 10 -H 20 -H 30 -H 40 --asym
+```
+
+
 
 ### Invoking Dice directly
 
