@@ -1,0 +1,30 @@
+dtmc
+
+const double p1;
+const double q1;
+
+const double p2;
+const double q2;
+
+const double p3;
+const double q3;
+
+const double p4;
+const double q4;
+
+const double p5;
+const double q5;
+
+module factory1
+    state1 : bool init false;
+    [act] state1 = true -> p1: (state1'=true) + 1-p1: (state1'=false);
+    [act] state1 = false -> q1: (state1'=true) + 1-q1: (state1'=false);
+endmodule
+
+module factory2 = factory1[state1=state2,p1=p2,q1=q2] endmodule
+module factory3 = factory1[state1=state3,p1=p3,q1=q3] endmodule
+module factory4 = factory1[state1=state4,p1=p4,q1=q4] endmodule
+module factory5 = factory1[state1=state5,p1=p5,q1=q5] endmodule
+
+label "allStrike" = state1 & state2 & state3 & state4 & state5;
+
