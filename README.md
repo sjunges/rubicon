@@ -251,7 +251,7 @@ Value   Probability
 36.5432331562
 ```
 
-
+To interpret this output and build the table:
 
 **Table 1 (middle column)**: 
 From the following output of storm, we distilled the build and model checking times.
