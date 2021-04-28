@@ -76,7 +76,11 @@ class RubiconContext:
                     file.write(",".join([str(stat["identifiers"][ident]) for ident in identifiers]))
                     for toolid in self._tool_ids():
                         file.write(",")
-                        file.write(str(stat[toolid]["total_time"]))
+                        time = stat[toolid]["total_time"]
+                        if time == -1:
+                           file.write("")
+                        else:
+                            file.write(str(time))
                     file.write("\n")
 
         if self.csv_path is not None:
