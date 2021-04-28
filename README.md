@@ -82,20 +82,44 @@ To generate a CSV file for **Figure 1c**, please run:
 ```
 python rubicon/regression.py --export-csv "fig1c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add factory -H 10 -N 5 -N 9 -N 12 -N 13 -N 15 -N 17 -N 19
 ```
-This will create a series of benchmark evaluations with horizon 10 (`-H 10`) and 8, 10, 13, 15, 17, and 19 parallel factories. This generates a file `fig1c.csv` which has the following contents (note that precise numbers may vary due to differences in the running environment, but the important thing is that the relative trend of rubicon scaling to more states holds):
+This will create a series of benchmark evaluations with horizon 10 (`-H 10`) and 8, 10, 13, 15, 17, and 19 parallel factories. This generates a file `fig1c.csv` which has the following contents when run with a 3-second timeout (note that precise numbers may vary due to differences in the running environment, but the important thing is that the relative trend of rubicon scaling to more states holds).
+
 ```
+family, instance,dice-time,dice-result,storm-sparse-time,storm-sparse-result,storm-dd-time,storm-dd-result
+factory,N=5;horizon=10,0.01,0.04459,0.02,0.04459,0.17,0.04459
+factory,N=9;horizon=10,0.04,0.00054,0.19,0.00054,-1.00,-1.00000
+factory,N=12;horizon=10,0.53,0.00003,-1.00,-1.00000,-1.00,-1.00000
 ...
 ```
+
+* Note here that, for `N=9` factories, storm using the `dd` option is timing out (since the result and time are both listed as `-1`).
+* To compare this output with Figure 1c, the black curve lists `dice-time`, the red curve lists `storm-sparse-time`, and the blue curve lists `storm-dd-time`. We do not include in this repository the ability to reproduce the green `prism` curve; it is not a critical comparison since its performance is dominated by `storm`.
+* If you want to export `fig1c.csv` from the Docker image, copy it into the `/data` directory which will place the file in the current working directory outside of the image.
+
+Moving on to the other figures:
+
 
 **Figure 9a**: 
 ```
 python rubicon/regression.py --export-csv "fig9a.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add weatherfactory -H 10 -N 9 -N 12 -N 15 -N 17
 ```
 
+This generates a CSV of the following format (when run with a 3-second timeout):
+```
+family, instance,dice-time,dice-result,storm-sparse-time,storm-sparse-result,storm-dd-time,storm-dd-result
+weatherfactory,N=9;horizon=10,0.15,0.00000,0.60,0.00000,-1.00,-1.00000
+...
+```
+
+* In Figure 9, the black curve corresponds to `dice-time`, the green curve corresponds to `storm-sparse-time`, and the red curve corresponds to `storm-dd-time`. 
+* All the following subsequent commands follow the same output format.
+
+
 **Figure 9b**:
 ```
 python rubicon/regression.py --export-csv "fig9b.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 13 -H 10 -H 20 -H 30 -H 40
 ```
+
 
 **Figure 9c**:
 ```
