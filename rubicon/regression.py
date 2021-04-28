@@ -8,6 +8,7 @@ import click
 import numpy as np
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
 
@@ -86,7 +87,7 @@ class RubiconContext:
 
 @click.group(chain=True)
 @click.option("--stats-file", default="stats.json")
-@click.option("--export-csv")
+@click.option("--export-csv", help="path for csv output")
 @click.pass_context
 def cli(ctx, stats_file, export_csv):
     ctx.obj = RubiconContext(stats_file, export_csv)
@@ -108,6 +109,7 @@ def include_dice(ctx, cwd, cmd, extra_arguments, only_parse, timeout):
         arguments += ["-skip-table"]
     dice = dice_wrapper.Dice(cwd, cmd, arguments, timeout)
     ctx.obj.dice_wrapper = dice
+    return ctx
 
 @cli.command()
 @click.option("--cwd", default=".")
@@ -152,13 +154,14 @@ def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_
 @click.option("--nr_factories", "-N", type=click.Choice(['10', '12', '15']), multiple=True, default=['10'])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
-def factory_parametric(nr_factories, horizon):
+def factory_parametric(ctx, nr_factories, horizon):
     for N in nr_factories:
         pvals = [{**{f"p{n}": _sample() for n in range(1, N + 1)}, **{f"q{n}": _sample() for n in range(1, N + 1)}} for _
                  in range(5)]
 
         for H in horizon:
             rubicon.translate(get_examples_path(f"factory{N}-par.prism"), f"P=? [ F<={H} \"allStrike\"]", "", get_output_path(f"factory-{N}-H={H}.dice"), parameter_instantiations=pvals)
+    return ctx
 
 
 @cli.command()
@@ -170,6 +173,7 @@ def factory(ctx, nr_factories, horizon):
         for H in horizon:
             _run(ctx.obj, "factory", {"N": N, "horizon": H}, get_examples_path("factory", f"factory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
                  get_output_path("factory", f"factory{N}-H={H}.dice"))
+    return ctx
 
 
 @cli.command()
@@ -181,6 +185,7 @@ def weatherfactory(ctx, nr_factories, horizon):
         for H in horizon:
             _run(ctx.obj, "weatherfactory", {"N": N, "horizon": H}, get_examples_path("weatherfactory", f"weatherfactory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
                  get_output_path("weatherfactory", f"weatherfactory{N}-H={H}.dice"))
+    return ctx
 
 
 @cli.command()
@@ -194,6 +199,7 @@ def parqueues(ctx, nr_queues, nr_elements, horizon):
         for N in nr_elements:
              for H in horizon:
                  _run(ctx.obj,  "parqueues", {"K": K, "N": N, "horizon": H}, get_examples_path("parqueues", f"queue-{K}.nm"), f"P=? [ F<={H} \"target\" ]", f"N={N}", get_output_path("parqueues", f"queues-{K}-{N}-H={H}.dice"), force_bounded=True)
+    return ctx
 
 
 @cli.command()
@@ -210,6 +216,29 @@ def herman(ctx, nr_stations, asym, horizon):
                      get_output_path("herman", f"herman-ri-{N}-H={H}.dice"), overlapping_guards=True)
             else:
                 _run(ctx.obj, "herman", {"asym": False, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}.prism"), f"P=? [ F<={H} \"stable\" ]", f"", get_output_path("herman", f"herman-{N}-H={H}.dice"), overlapping_guards=True)
+    return ctx
+
+
+@cli.command()
+@click.option("--nr-stations", "-N", type=click.Choice(['13', '15', '17', '19']), multiple=True, default=['13'])
+@click.option("--asym", is_flag=True, help="Are the station probabilities asymmetric?")
+@click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
+@click.pass_context
+def herman_parametric(ctx, nr_stations, asym, horizon):
+    if not asym:
+        raise RuntimeError("We currently only integrated an asymetric version of parametric herman")
+    for N in nr_stations:
+        N = int(N)
+        pvals = [{**{f"p{n}": _sample() for n in range(1, N + 1)}} for
+                 _
+                 in range(5)]
+        for H in horizon:
+            if asym:
+                _run(ctx.obj, "herman", {"asym": True, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}-random-parametric.prism"), f"P=? [ F<={H} \"stable\" ]", f"",
+                     get_output_path("herman", f"herman-ri-par-{N}-H={H}.dice"), overlapping_guards=True,parameter_instantiations=pvals)
+            else:
+                assert False, "Check is before"
+    return ctx
 
 
 @cli.command()
@@ -222,6 +251,7 @@ def brp(ctx, chunks, retries, horizon):
         for MAX in retries:
              for H in horizon:
                  _run(ctx.obj,  "brp", {"retries": MAX, "chunks": N, "horizon": H}, get_examples_path("brp", "brp.v1.prism"), f"P=? [ F<={H} s=5 ]", f"N={N},MAX={MAX}", get_output_path("brp", f"brp-{N}-{MAX}-H={H}.dice"), make_flat=False)
+    return ctx
 
 
 @cli.command()
@@ -234,6 +264,7 @@ def nand(ctx, n_values, k_values, horizon):
         for K in k_values:
             for H in horizon:
                 _run(ctx.obj, "nand", {"N": N, "K": K, "horizon": H}, get_examples_path("nand", "nand.v1.prism"), f"P=? [ F<={H} s=4 & 10*z<N ]", f"N={N},K={K}", get_output_path("nand", f"nand-{N}-{K}-H={H}.dice"))
+    return ctx
 
 
 @cli.command()
@@ -246,6 +277,7 @@ def egl(ctx, n_values, l_values, horizon):
         for L in l_values:
             for H in horizon:
                 _run(ctx.obj, "egl", {"N": N, "L": L, "horizon": H}, get_examples_path("egl","egl.v1.prism"), f"P=? [ F<={H} !\"knowA\" & \"knowB\" ]", f"N={N},L={L}", get_output_path("egl", f"egl-{N}-{L}-H={H}.dice"), force_max_int_val=20)
+    return ctx
 
 
 @cli.command()
@@ -258,6 +290,7 @@ def crowds(ctx, runs, crowdsize, horizon):
         for S in crowdsize:
             for H in horizon:
                 _run(ctx.obj, "crowds", {"Runs": R, "Size": S, "horizon": H}, get_examples_path("crowds", "crowds.v1.prism"), f"P=? [ F<={H} observe0>1]", f"TotalRuns={R},CrowdSize={S},PF=0.8,badC=0.2", get_output_path("crowds", f"crowds-{R}-{S}-H={H}.dice"), overlapping_guards=True)
+    return ctx
 
 
 @cli.command()
@@ -272,7 +305,11 @@ def leader(ctx, n_values, k_values, horizon):
             K = int(K)
             for H in horizon:
                 _run(ctx.obj, "leader", {"N": N, "K": K, "horizon": H}, get_examples_path("leader_sync", f"leader_synch_{N}_{K}.prism"), f"P=? [ F<={H} \"elected\" ]", "", get_output_path("leader_sync",  f"leader_sync_{N}_{K}-H={H}.dice"), make_flat=False, force_bounded=True)
+    return ctx
 
 
 if __name__ == "__main__":
-    cli()
+    state = cli(standalone_mode=False)
+    if state is not None and type(state) is not int:
+        ctx = state[0].obj
+        ctx.finalize()
