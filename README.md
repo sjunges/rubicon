@@ -34,6 +34,32 @@ Users of an artifact/Docker container can skip this step.
     (Note: These branches are in the process of being merged back into Storm(py) version 1.7.0)
 - Install Dice from source [from this branch](https://github.com/SHoltzen/dice/tree/symbolic)
 
+## Running Rubicon
+
+First and foremost, Rubicon translates Prism programs and properties to equivalent Dice programs.
+```
+python rubicon/rubicon.py --prism examples/factory/factory3.prism --prop 'P=? [F<=2 "allStrike"]' --output "factory-3-2.dice"
+```
+Some files require additional constants to be set, as standard for prism files:
+```
+python rubicon/rubicon.py --prism examples/parqueues/queue-8.nm --prop 'P=? [F<=8 "target"]' -const "N=4" --output "queue-8-4-8.dice"
+```
+
+Rubicon can be used to invoke Dice directly. In the docker container, first run: 
+```
+eval $(opam env)
+```
+Then:
+```
+python rubicon/rubicon.py --prism examples/factory/factory3.prism --prop 'P=? [F<=2 "allStrike"]' --output "factory-3-2.dice" --run-dice 
+```
+We provide a couple of arguments to set-up Dice:
+- `--dice-cwd` The working directory from which to run Dice. Defaults to `.`.
+- `--dice-cmd` The command with which to invoke dice, defaults to `dice`.
+- `--dice-to` A timeout, default is 1800 seconds.
+- `--dice-args` A string with further arguments to be passed to Dice.
+
+
 ## Experiments
 To reproduce the experiments from [1], we provide some convenience scripts. 
 We first go through the steps of reproducing data, then give some general usage rules.
@@ -104,30 +130,30 @@ python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/r
 **Table 1 (middle column)**: 
 From the following output of storm, we distilled the build and model checking times.
 ```
-./reference_scripts/storm-sample-add.sh /opt/storm/build/ experiments/ 1800
+./reference-scripts/storm-sample-add.sh /opt/storm/build/ examples/ 1800
 ```
-(Notice that we add a small example to test our setup)
+(Notice that we add a small example to test our setup). The 1800 refers to the timeout in seconds.
 
 **Table 1 (right column)**:
 From the following output of storm, we concluded all benchmarks timed out. 
 ```
-./reference_scripts/storm-solution-function.sh /opt/storm/build/ experiments/ 1800
+./reference-scripts/storm-solution-function.sh /opt/storm/build/ examples/ 1800
 ```
-(Notice that we add a small example to test our setup)
+(Notice that we add a small example to test our setup). The 1800 refers to the timeout in seconds.
 
 ### More examples
 
 You can use our regression suite to generate many more tests.
 
 ```
-python rubicon/regression.py brp -H 5 -H 15 -N 8 -N 10 
+python rubicon/regression.py brp -N 4 -N 8 -MAX 2 -MAX 3 -H 10 -H 20 
 ```
+We refer to running `python/regression.py --help` for options. 
 
 If things ever break, be sure to check out the logfile `rubicon-regression.log`.
 
-#### Invoking Dice directly
-
-We can configure the script to run Dice (from commandline) directly:
+As the examples above exemplify: the script allows to configure the script to run Dice (from commandline) directly:
+A particularly helpful feature is the ability to only check whether the Dice can be parsed, which can be invoked with:
 ```
 python rubicon/regression.py include-dice --cwd "/opt/rubicon" --cmd "dice" --only-parse weatherfactory -H 10 -H 15 -N 8 -N 10 
 ```
