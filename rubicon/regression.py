@@ -86,9 +86,10 @@ class RubiconContext:
 
 @click.group(chain=True)
 @click.option("--stats-file", default="stats.json")
+@click.option("--export-csv")
 @click.pass_context
-def cli(ctx, stats_file):
-    ctx.obj = RubiconContext(stats_file)
+def cli(ctx, stats_file, export_csv):
+    ctx.obj = RubiconContext(stats_file, export_csv)
     return ctx
 
 @cli.command()
@@ -96,15 +97,16 @@ def cli(ctx, stats_file):
 @click.option("--cmd", default="dice")
 @click.option("--extra-arguments", default="")
 @click.option("--only-parse", is_flag=True)
+@click.option("--timeout", "-TO", type=int, help="Time out", default="900")
 @click.pass_context
-def include_dice(ctx, cwd, cmd, extra_arguments, only_parse):
+def include_dice(ctx, cwd, cmd, extra_arguments, only_parse, timeout):
     if extra_arguments == "":
         arguments = []
     else:
         arguments = extra_arguments.strip().split(" ")
     if only_parse:
         arguments += ["-skip-table"]
-    dice = dice_wrapper.Dice(cwd, cmd, arguments)
+    dice = dice_wrapper.Dice(cwd, cmd, arguments, timeout)
     ctx.obj.dice_wrapper = dice
 
 @cli.command()
@@ -112,13 +114,14 @@ def include_dice(ctx, cwd, cmd, extra_arguments, only_parse):
 @click.option("--cmd", default="dice")
 @click.option("--extra-arguments", default="")
 @click.option("--add", is_flag=True)
+@click.option("--timeout", "-TO", type=int, help="Time out", default="900")
 @click.pass_context
-def include_storm(ctx, cwd, cmd, extra_arguments, add):
+def include_storm(ctx, cwd, cmd, extra_arguments, add, timeout):
     if extra_arguments == "":
         arguments = []
     else:
         arguments = extra_arguments.strip().split(" ")
-    storm = storm_wrapper.Storm(cwd, cmd, arguments, symbolic=add)
+    storm = storm_wrapper.Storm(cwd, cmd, arguments, symbolic=add, timeout=timeout)
     ctx.obj.storm_wrappers.append(storm)
     return ctx
 
@@ -128,8 +131,8 @@ def _sample():
         res = np.random.random_sample()
     return res
 
-def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_path, **kwargs):
-    rubicon.translate(prism_path, prop, consts, dice_path, **kwargs)
+def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_path, parameter_instantiations = dict(), **kwargs):
+    rubicon.translate(prism_path, prop, consts, dice_path, parameter_instantiations=parameter_instantiations, **kwargs)
     stats = dict()
     stats["family"] = family_name
     stats["identifiers"] = instance
@@ -138,13 +141,15 @@ def _run(rubicon_context, family_name, instance, prism_path, prop, consts, dice_
     stats["constants"] = consts
     if rubicon_context.dice_wrapper is not None:
         stats["dice"] = rubicon_context.dice_wrapper.run(dice_path)
+    if len(parameter_instantiations) > 0 and len(rubicon_context.storm_wrappers):
+        print("Warning, this script does not support parametric capabilities of storm.")
     for wrapper in rubicon_context.storm_wrappers:
         stats[wrapper.id] = wrapper.run(prism_path, prop, consts)
     rubicon_context.store_stats(stats)
 
 
 @cli.command()
-@click.option("--nr_factories", "-N", type=click.Choice(['10', '12', '15']), multiple=True, default=[10])
+@click.option("--nr_factories", "-N", type=click.Choice(['10', '12', '15']), multiple=True, default=['10'])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def factory_parametric(nr_factories, horizon):
@@ -179,24 +184,26 @@ def weatherfactory(ctx, nr_factories, horizon):
 
 
 @cli.command()
-@click.option("--nr-queues", "-Q", type=click.Choice([8, 9, 10]), multiple=True, default=[8])
+@click.option("--nr-queues", "-Q", type=click.Choice(['8', '9', '10']), multiple=True, default=['8'])
 @click.option("--nr-elements", "-N", type=click.IntRange(2,None), multiple=True, default=[3])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def parqueues(ctx, nr_queues, nr_elements, horizon):
     for K in nr_queues:
-         for N in nr_elements:
+        K = int(K)
+        for N in nr_elements:
              for H in horizon:
                  _run(ctx.obj,  "parqueues", {"K": K, "N": N, "horizon": H}, get_examples_path("parqueues", f"queue-{K}.nm"), f"P=? [ F<={H} \"target\" ]", f"N={N}", get_output_path("parqueues", f"queues-{K}-{N}-H={H}.dice"), force_bounded=True)
 
 
 @cli.command()
-@click.option("--nr-stations", "-N", type=click.Choice([13, 15, 17, 19]), multiple=True, default=[13])
+@click.option("--nr-stations", "-N", type=click.Choice(['13', '15', '17', '19']), multiple=True, default=['13'])
 @click.option("--asym", is_flag=True, help="Are the station probabilities asymmetric?")
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
 @click.pass_context
 def herman(ctx, nr_stations, asym, horizon):
     for N in nr_stations:
+        N = int(N)
         for H in horizon:
             if asym:
                 _run(ctx.obj, "herman", {"asym": True, "N": N, "horizon": H}, get_examples_path("herman", f"herman-{N}-random-input.prism"), f"P=? [ F<={H} \"stable\" ]", f"",

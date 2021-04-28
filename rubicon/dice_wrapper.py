@@ -7,9 +7,10 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 class Dice:
-    def __init__(self, cwd, path, arguments):
+    def __init__(self, cwd, path, arguments, timeout):
         self._path = path.split(" ")
         self._cwd = cwd
+        self._timeout = timeout
         if arguments is None:
             self._arguments = ["-json", "-time"]
         else:
@@ -22,8 +23,7 @@ class Dice:
         stats = dict()
         stats["file"] = file
         try:
-            stdout = subprocess.check_output(invocation, timeout=1000, cwd=self._cwd)
-            # stdout, stderr = process.communicate()
+            stdout = subprocess.check_output(invocation, timeout=self._timeout, cwd=self._cwd)
             stdout = stdout.decode("utf-8")
             # stderr = stderr.decode("utf-8")
             # logger.debug(stdout)
@@ -37,5 +37,5 @@ class Dice:
         except subprocess.TimeoutExpired:
             stats["total_time"] = -1
             stats["result"] = -1
-            logger.info(f"Done: Result: {stats['result']}. Took {stats['total_time']}s")
+            logger.info(f"Time out")
             return stats

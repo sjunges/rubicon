@@ -35,7 +35,12 @@ Users of an artifact/Docker container can skip this step.
 - Install Dice from source [from this branch](https://github.com/SHoltzen/dice/tree/symbolic)
 
 ## Experiments
-To reproduce the experiments from [1], we provide some convenience scripts. First, inside the VM, 
+To reproduce the experiments from [1], we provide some convenience scripts. 
+We first go through the steps of reproducing data, then give some general usage rules.
+Throughout, we assume you use the Docker container.
+
+
+First, inside the Docker container, 
 set up the environment by executing:
 
 ```
@@ -48,7 +53,7 @@ The following commands each generate a CSV file that contains the data that is u
 To generate a CSV file for **Figure 1c**, please run:
 
 ```
-python rubicon/regression.py --export-csv "fig1c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" factory -H 10 -N 5 -N 9 -N 12 -N 13 -N 15 -N 17 -N 19
+python rubicon/regression.py --export-csv "fig1c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add factory -H 10 -N 5 -N 9 -N 12 -N 13 -N 15 -N 17 -N 19
 ```
 This will create a series of benchmark evaluations with horizon 10 (`-H 10`) and 8, 10, 13, 15, 17, and 19 parallel factories. This generates a file `fig1c.csv` which has the following contents (note that precise numbers may vary due to differences in the running environment, but the important thing is that the relative trend of rubicon scaling to more states holds):
 ```
@@ -61,51 +66,61 @@ factory,N=12;horizon=10,0.54,0.00003,12.84,0.00003
 
 **Figure 9a**: 
 ```
-python rubicon/regression.py --export-csv "fig9a.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" weatherfactory -H 10 -N 9 -N 12 -N 15 -N 17
+python rubicon/regression.py --export-csv "fig9a.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add weatherfactory -H 10 -N 9 -N 12 -N 15 -N 17
 ```
 
 **Figure 9b**:
 ```
-python rubicon/regression.py --export-csv "fig9b.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 13 -H 10 -H 20 -H 30 -H 40
+python rubicon/regression.py --export-csv "fig9b.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 13 -H 10 -H 20 -H 30 -H 40
 ```
 
 **Figure 9c**:
 ```
-python rubicon/regression.py --export-csv "fig9c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 13 -H 10 -H 20 -H 30 -H 40 --asym
+python rubicon/regression.py --export-csv "fig9c.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 13 -H 10 -H 20 -H 30 -H 40 --asym
 ```
 
 **Figure 9d**:
 ```
-python rubicon/regression.py --export-csv "fig9d.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 17 -H 10 -H 20 -H 30 -H 40
+python rubicon/regression.py --export-csv "fig9d.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 17 -H 10 -H 20 -H 30 -H 40
 ```
 
 **Figure 9e**:
 ```
-python rubicon/regression.py --export-csv "fig9e.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 17 -H 10 -H 20 -H 30 -H 40 --asym
+python rubicon/regression.py --export-csv "fig9e.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 17 -H 10 -H 20 -H 30 -H 40 --asym
 ```
 
 **Figure 9f**:
 ```
-python rubicon/regression.py --export-csv "fig9f.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 19 -H 10 -H 20 -H 30 -H 40
+python rubicon/regression.py --export-csv "fig9f.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 19 -H 10 -H 20 -H 30 -H 40
 ```
 
 **Figure 9g**:
 ```
-python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" include-storm --cmd "storm" herman -N 19 -H 10 -H 20 -H 30 -H 40 --asym
+python rubicon/regression.py --export-csv "fig9g.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO 1800 include-storm --cmd "storm" -TO 1800 include-storm --cmd "storm" -TO 1800 --add herman -N 19 -H 10 -H 20 -H 30 -H 40 --asym
 ```
 
+**Table 1 (left column)**:
 
+**Table 1 (middle column)**:
 
-### Invoking Dice directly
+**Table 1 (right column)**:
+
+### More examples
+
+You can use our regression suite to generate many more tests.
+
+```
+python rubicon/regression.py brp -H 5 -H 15 -N 8 -N 10 
+```
+
+If things ever break, be sure to check out the logfile `rubicon-regression.log`.
+
+#### Invoking Dice directly
 
 We can configure the script to run Dice (from commandline) directly:
 ```
-python rubicon/regression.py include-dice --cwd "/opt/rubicon" --cmd "dice" weatherfactory -H 10 -H 15 -N 8 -N 10 
+python rubicon/regression.py include-dice --cwd "/opt/rubicon" --cmd "dice" --only-parse weatherfactory -H 10 -H 15 -N 8 -N 10 
 ```
-
-
-## How can I run Rubicon on my own files?
-
 
 
 ## Creating a Docker Container
@@ -118,8 +133,6 @@ The container can be built by executing a command in the `rubicon` directory lik
 ```
 docker build --tag rubicon:1.0 .
 ```
-
-## Sources
 
 ## References
 - [2] https://www.stormchecker.org

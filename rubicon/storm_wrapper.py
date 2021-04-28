@@ -6,9 +6,10 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 class Storm:
-    def __init__(self, cwd, path, arguments, symbolic):
+    def __init__(self, cwd, path, arguments, symbolic, timeout):
         self._path = path.split(" ")
         self._cwd = cwd
+        self._timeout = timeout
         self._id = "storm" + ("-dd" if symbolic else "-sparse")
         if len(arguments) > 0:
             self._id += "-" + "-".join(arguments)
@@ -30,8 +31,7 @@ class Storm:
         stats["file"] = prism_path
         try:
             logger.info("Run Storm... " + " ".join(invocation) + " from " + self._cwd)
-            stdout = subprocess.check_output(invocation, timeout=1000, cwd=self._cwd)
-            # stdout, stderr = process.communicate()
+            stdout = subprocess.check_output(invocation, timeout=self._timeout, cwd=self._cwd)
             stdout = stdout.decode("utf-8")
             for line in stdout.split("\n"):
                 if line.startswith("Result"):
@@ -42,9 +42,9 @@ class Storm:
             logger.info(f"Done: Result: {stats['result']}. Took {stats['total_time']}s")
             return stats
         except subprocess.TimeoutExpired:
-            stats["total_time"] = -1
-            stats["result"] = -1
-            logger.info(f"Done: Result: {stats['result']}. Took {stats['total_time']}s")
+            stats["total_time"] = "TO"
+            stats["result"] = "N/A"
+            logger.info(f"Time out: Result: {stats['result']}. Took {stats['total_time']}s")
             return stats
 
 
