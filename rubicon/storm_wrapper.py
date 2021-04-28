@@ -9,12 +9,17 @@ class Storm:
     def __init__(self, cwd, path, arguments, symbolic):
         self._path = path.split(" ")
         self._cwd = cwd
+        self._id = "storm-" + "-dd-" if symbolic else "-sparse-" + "-".join(arguments)
         if arguments is None:
             self._arguments = ['-tm', '--sylvan:threads', '1']
         else:
             self._arguments = arguments + ['-tm', '--sylvan:threads', '1']
         if symbolic:
             self._arguments += ['-e', 'dd']
+
+    @property
+    def id(self):
+        return self._id
 
     def run(self, prism_path, prop, constants):
         invocation = self._path + ["--prism", prism_path, "--prop", prop, "-const", constants] + self._arguments
