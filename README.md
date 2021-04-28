@@ -90,6 +90,7 @@ To easily execute all the commands in this section with a 100-second timeout, fr
 ./reference-scripts/scaling.sh
 ./reference-scripts/symbolic.sh
 ```
+You can change the top line in scaling.sh to generate a different time-out.
 Together these commands can take hours to run. To speed things up, you can replace the timeouts in `scaling.sh` with your preferred timeout in seconds.
 We now go through these commands step by step.
 
