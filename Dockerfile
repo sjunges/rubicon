@@ -6,6 +6,9 @@ WORKDIR /opt/rubicon
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+# install latex
+RUN apt-get update && apt-get install texlive-latex-recommended texlive-latex-extra -y 
+
 # install dice
 
 RUN apt-get install -y ocaml opam
@@ -32,5 +35,5 @@ COPY . .
 
 RUN python setup.py install
 
-RUN mkdir /opt/rubicon/dice-examples
-RUN mkdir /opt/rubicon/factory
+RUN mkdir -p /opt/rubicon/dice-examples
+RUN mkdir -p /opt/rubicon/factory
