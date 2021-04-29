@@ -20,3 +20,4 @@ python rubicon/regression.py --graph-csv "fig9f.csv" include-dice --cwd "/opt/ru
 python rubicon/regression.py --graph-csv "fig9g.csv" include-dice --cwd "/opt/rubicon" --cmd "dice" -TO "$TO" include-storm --cmd "storm" -TO "$TO" include-storm --cmd "storm" -TO "$TO" --add parqueues -N 8 -H 3 -H 5 -H 10 -H 15
 
 pdflatex experiment-render.tex
+pdflatex experiment-render.tex
