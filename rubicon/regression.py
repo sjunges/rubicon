@@ -220,6 +220,18 @@ def weatherfactory(ctx, nr_factories, horizon):
 
 
 @cli.command()
+@click.option("--nr_factories", "-N", type=click.IntRange(7,20), multiple=True, default=[10])
+@click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])
+@click.pass_context
+def extweatherfactory(ctx, nr_factories, horizon):
+    for N in nr_factories:
+        for H in horizon:
+            _run(ctx.obj, "extended-weatherfactory", {"N": N, "horizon": H}, get_examples_path("extended-weatherfactory", f"weatherfactory{N}.prism"), f"P=? [ F<={H} \"allStrike\"]", "",
+                 get_output_path("extended-weatherfactory", f"weatherfactory{N}-H={H}.dice"))
+    return ctx
+
+
+@cli.command()
 @click.option("--nr-queues", "-Q", type=click.Choice(['8', '9', '10']), multiple=True, default=['8'])
 @click.option("--nr-elements", "-N", type=click.IntRange(2,None), multiple=True, default=[3])
 @click.option("--horizon", "-H", type=click.IntRange(0,None), multiple=True, default=[10])

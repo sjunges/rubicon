@@ -10,6 +10,7 @@ We provide three original benchmarks
 - parqueues
 - factory
 - weatherfactory
+- extended-weatherfactory
 
 
 

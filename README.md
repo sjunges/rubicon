@@ -27,6 +27,9 @@ docker run --mount type=bind,source="$(pwd)",target=/data -w /opt/rubicon -it --
 To export files out of the Docker image,
 files that are in the `/data` directory inside the image are available on the host system in the current working directory.
 
+**Note**
+We tested these docker containers with 6GB of memory. 
+
 **Note** 
 This docker container may yield difficulties running on the new Mac M1 Chipset. 
 The [following link](https://docs.docker.com/docker-for-mac/apple-silicon/) shows how to run this docker in emulation, and may resolve these issues.
