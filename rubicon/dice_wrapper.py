@@ -39,3 +39,8 @@ class Dice:
             stats["result"] = -1
             logger.info(f"Time out")
             return stats
+        except subprocess.CalledProcessError:
+            stats["total_time"] = -1
+            stats["result"] = -1
+            logger.info(f"Process Error")
+            return stats

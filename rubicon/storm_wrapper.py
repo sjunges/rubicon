@@ -46,6 +46,11 @@ class Storm:
             stats["result"] = -1
             logger.info(f"Time out: Result: {stats['result']}. Took {stats['total_time']}s")
             return stats
+        except subprocess.CalledProcessError:
+            stats["total_time"] = -1
+            stats["result"] = -1
+            logger.info(f"Process Error")
+            return stats
 
 
 
